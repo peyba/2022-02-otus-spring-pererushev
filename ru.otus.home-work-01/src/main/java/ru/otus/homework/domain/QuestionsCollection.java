@@ -1,4 +1,4 @@
-package ru.otus.homework.entity;
+package ru.otus.homework.domain;
 
 import java.util.ArrayList;
 

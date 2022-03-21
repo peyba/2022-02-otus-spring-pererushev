@@ -1,33 +1,35 @@
-package ru.otus.homework.entity;
+package ru.otus.homework.domain;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
 
 class SimpleQuestionTest {
 
     @Test
     void getTextTest() {
         var text = "Test question?";
-        var q = new SimpleQuestion(text);
+        var q = new Question(text);
 
         Assertions.assertEquals(text, q.getText());
     }
 
     @Test
     void hasAnswersTest() {
-        var q1 = new SimpleQuestion("Test", new String[] { "a1", "a2", "a3" });
+        var q1 = new Question("Test", Arrays.asList("a1", "a2", "a3"));
         Assertions.assertTrue(q1.hasAnswers());
 
-        var q2 = new SimpleQuestion("Test");
+        var q2 = new Question("Test");
         Assertions.assertFalse(q2.hasAnswers());
     }
 
     @Test
     void getAnswersTest() {
         var text = "Test question?";
-        var answers = new String[] { "a1", "a2", "a3" };
-        var q = new SimpleQuestion(text, answers);
+        var answers = Arrays.asList("a1", "a2", "a3");
+        var q = new Question(text, answers);
 
-        Assertions.assertArrayEquals(answers, q.getAnswers().toArray());
+        Assertions.assertEquals(answers, q.getAnswers());
     }
 }

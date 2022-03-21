@@ -1,6 +1,6 @@
-package ru.otus.homework.dao;
+package ru.otus.homework.service;
 
-public class IncorrectCsvQuestionFileFormatException extends Exception {
+public class IncorrectCsvQuestionFileFormatException extends RuntimeException {
 
     public IncorrectCsvQuestionFileFormatException() {}
 

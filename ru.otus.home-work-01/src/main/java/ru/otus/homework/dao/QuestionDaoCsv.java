@@ -1,66 +1,51 @@
 package ru.otus.homework.dao;
 
 import com.opencsv.CSVReader;
-import lombok.SneakyThrows;
-import ru.otus.homework.entity.Question;
-import ru.otus.homework.entity.QuestionsCollection;
-import ru.otus.homework.entity.SimpleQuestion;
+import com.opencsv.exceptions.CsvValidationException;
+import ru.otus.homework.domain.QuestionsCollection;
 import org.springframework.core.io.Resource;
+import ru.otus.homework.service.QuestionParser;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 public class QuestionDaoCsv implements QuestionDao {
 
-    private final Resource csvFile;
+    private final Resource resource;
     private final boolean hasHeader;
+    private final QuestionParser parser;
 
-    public QuestionDaoCsv(Resource csvFile, boolean hasHeader) {
-        this.csvFile = csvFile;
+    public QuestionDaoCsv(Resource resource, QuestionParser parser, boolean hasHeader) {
+        this.resource = resource;
+        this.parser = parser;
         this.hasHeader = hasHeader;
     }
 
-    @SneakyThrows
-    private QuestionsCollection parseCsv() {
+    public QuestionsCollection getAll() {
         var questions = new QuestionsCollection();
-        CSVReader reader = new CSVReader(new InputStreamReader(csvFile.getInputStream()));
-
-        if (hasHeader) {
-            reader.readNext();
+        CSVReader reader;
+        try {
+            reader = new CSVReader(new InputStreamReader(resource.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
 
-        String[] csvRow;
-        while ((csvRow = reader.readNext()) != null) {
-            questions.add(parseQuestion(csvRow));
-        }
+        try {
+            if (hasHeader) {
+                reader.readNext();
+            }
 
-        return questions;
-    }
-
-    private Question parseQuestion(String[] csvRow) throws IncorrectCsvQuestionFileFormatException {
-        var question = csvRow[0];
-        if (question.isEmpty()) {
-            throw new IncorrectCsvQuestionFileFormatException("Empty row");
-        }
-
-        List<String> answers = new ArrayList<>();
-        for(int i = 1; i < csvRow.length; i++){
-            if (!csvRow[i].isEmpty()){
-                answers.add(csvRow[i]);
+            String[] csvRow;
+            while ((csvRow = reader.readNext()) != null) {
+                questions.add(parser.parse(Arrays.asList(csvRow)));
             }
         }
-
-        if (answers.size() == 0) {
-            return new SimpleQuestion(question, new String[0]);
+        catch (CsvValidationException | IOException e) {
+            e.printStackTrace();
+            return null;
         }
-        else {
-            return new SimpleQuestion(question, answers.toArray(String[]::new));
-        }
-    }
-
-    public QuestionsCollection getAll() {
-        return parseCsv();
+        return questions;
     }
 }
