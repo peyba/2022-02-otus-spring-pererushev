@@ -1,9 +1,9 @@
-package ru.otus.homework;
+package ru.otus.homework01;
 
 import lombok.SneakyThrows;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import ru.otus.homework.service.QuestionsPrinterService;
-import ru.otus.homework.service.SimpleQuestionsPrinterService;
+import ru.otus.homework01.service.QuestionsPrinterService;
+import ru.otus.homework01.service.SimpleQuestionsPrinterService;
 
 public class App {
     @SneakyThrows

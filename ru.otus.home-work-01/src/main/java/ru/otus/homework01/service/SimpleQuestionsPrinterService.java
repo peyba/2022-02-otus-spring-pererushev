@@ -1,7 +1,7 @@
-package ru.otus.homework.service;
+package ru.otus.homework01.service;
 
-import ru.otus.homework.dao.QuestionDao;
-import ru.otus.homework.domain.Question;
+import ru.otus.homework01.dao.QuestionDao;
+import ru.otus.homework01.domain.Question;
 
 public class SimpleQuestionsPrinterService implements QuestionsPrinterService {
 

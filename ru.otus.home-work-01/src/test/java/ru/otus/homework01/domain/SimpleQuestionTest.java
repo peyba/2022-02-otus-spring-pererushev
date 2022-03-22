@@ -1,4 +1,4 @@
-package ru.otus.homework.domain;
+package ru.otus.homework01.domain;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

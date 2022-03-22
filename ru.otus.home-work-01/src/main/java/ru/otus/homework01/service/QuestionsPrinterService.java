@@ -1,4 +1,4 @@
-package ru.otus.homework.service;
+package ru.otus.homework01.service;
 
 public interface QuestionsPrinterService {
     void print();

@@ -68,7 +68,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>ru.otus.homework.App</mainClass>
+                            <mainClass>ru.otus.homework01.App</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

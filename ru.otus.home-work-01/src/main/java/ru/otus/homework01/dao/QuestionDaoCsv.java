@@ -1,10 +1,10 @@
-package ru.otus.homework.dao;
+package ru.otus.homework01.dao;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
-import ru.otus.homework.domain.QuestionsCollection;
+import ru.otus.homework01.domain.QuestionsCollection;
 import org.springframework.core.io.Resource;
-import ru.otus.homework.service.QuestionParser;
+import ru.otus.homework01.service.QuestionParser;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

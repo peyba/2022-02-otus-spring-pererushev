@@ -8,15 +8,15 @@
         <constructor-arg name="path" value="questions.csv"/>
     </bean>
 
-    <bean id="csvQuestionParser" class="ru.otus.homework.service.CsvQuestionParser"/>
+    <bean id="csvQuestionParser" class="ru.otus.homework01.service.CsvQuestionParser"/>
 
-    <bean id="questionDao" class="ru.otus.homework.dao.QuestionDaoCsv">
+    <bean id="questionDao" class="ru.otus.homework01.dao.QuestionDaoCsv">
         <constructor-arg name="resource" ref="questionResource"/>
         <constructor-arg name="parser" ref="csvQuestionParser"/>
         <constructor-arg name="hasHeader" value="true"/>
     </bean>
 
-    <bean id="questionPrinterService" class="ru.otus.homework.service.SimpleQuestionsPrinterService">
+    <bean id="questionPrinterService" class="ru.otus.homework01.service.SimpleQuestionsPrinterService">
         <constructor-arg name="questionDao" ref="questionDao"/>
     </bean>
 
