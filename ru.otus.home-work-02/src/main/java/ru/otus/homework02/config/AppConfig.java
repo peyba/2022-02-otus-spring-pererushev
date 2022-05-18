@@ -5,15 +5,25 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import ru.otus.homework02.dao.QuestionDao;
 import ru.otus.homework02.dao.QuestionDaoCsv;
 import ru.otus.homework02.dao.StudentDao;
 import ru.otus.homework02.dao.StudentDaoImpl;
+import ru.otus.homework02.domain.Answer;
+import ru.otus.homework02.domain.TestResult;
 import ru.otus.homework02.service.*;
+import ru.otus.homework02.service.write.*;
 
 @Configuration
 @PropertySource("classpath:application.properties")
 public class AppConfig {
+
+    @Bean
+    public Resource classPathResource() {
+        return new ClassPathResource("questions.csv");
+    }
 
     @Bean
     public QuestionParser csvQuestionParser() {
@@ -23,15 +33,10 @@ public class AppConfig {
     @Bean
     @Autowired
     public QuestionDao questionDaoCsv(
-            @Value("${testing.questions-file-path}") String filePath,
+            Resource resource,
             QuestionParser questionParser,
-            @Value("#{new Boolean('${testing.has-header}')}") Boolean hasHeader) {
-        return new QuestionDaoCsv(filePath, questionParser, hasHeader);
-    }
-
-    @Bean
-    public QuestionsPrinterService questionsPrinterService(QuestionDao questionDaoCsv) {
-        return new SimpleQuestionsPrinterService(questionDaoCsv);
+            @Value("${testing.has-header}") Boolean hasHeader) {
+        return new QuestionDaoCsv(resource, questionParser, hasHeader);
     }
 
     @Bean
@@ -40,12 +45,42 @@ public class AppConfig {
     }
 
     @Bean
-    public StudentRegistrationService studentRegistrationService(StudentDao studentDao) {
-        return new StudentRegistrationServiceImpl(studentDao);
+    public StudentRegistrationService studentRegistrationService(StudentDao studentDao, IOService ioService) {
+        return new StudentRegistrationServiceImpl(studentDao, ioService);
     }
 
     @Bean
-    public StudentTestingService studentTestingService(QuestionDao questionDao) {
-        return new StudentTestingServiceImpl(questionDao);
+    public WriteAnswerService writeAnswerService() {
+        return new WriteAnswerServiceImpl();
+    }
+
+    @Bean
+    public WriteQuestionForQuizService writeQuestionForQuizService(WriteAnswerService writeAnswerService) {
+        return new WriteQuestionForQuizService(writeAnswerService);
+    }
+
+    @Bean
+    public IOService consoleIOService() {
+        return new ConsoleIOService();
+    }
+
+    @Bean
+    public StudentTestingService studentTestingService(QuestionDao questionDao, IOService ioService, WriteQuestionForQuizService writeQuestionService) {
+        return new StudentTestingServiceImpl(questionDao, ioService, writeQuestionService);
+    }
+
+    @Bean
+    public WriteQuestionCorrectAnswersService writeQuestionCorrectAnswersService(WriteService<Answer> answerWriteService) {
+        return new WriteQuestionCorrectAnswersService(answerWriteService);
+    }
+
+    @Bean
+    public WriteService<TestResult> writeTestResultService(WriteQuestionCorrectAnswersService questionWriteService, WriteService<Answer> answerWriteService) {
+        return new WriteTestResultService(questionWriteService, answerWriteService);
+    }
+
+    @Bean
+    public QuizService quizService(StudentRegistrationService studentRegistrationService, StudentTestingService studentTestingService, WriteService<TestResult> writeService, IOService ioService) {
+        return new QuizServiceImpl(studentRegistrationService, studentTestingService, writeService, ioService);
     }
 }

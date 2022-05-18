@@ -1,12 +1,22 @@
 package ru.otus.homework02.domain;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 @Getter
 @RequiredArgsConstructor
-// TODO: нужен ли? подумать над системой хранения правильных ответов
 public class Answer {
-    private final String text;
-    private final boolean isCorrect;
+    @NonNull private final String text;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (!(obj instanceof Answer)) {
+            return false;
+        }
+
+        return ((Answer) obj).text.equals(text);
+    }
 }

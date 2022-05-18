@@ -1,113 +1,58 @@
 package ru.otus.homework02.domain;
 
 import lombok.Getter;
+import lombok.NonNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 public class Question {
 
     @Getter
     private final String text;
-    private final List<Answer> answers;
-    @Getter
-    private final QuestionType questionType;
+    private final Map<Answer, Boolean> answers = new HashMap<>();
 
-    private Integer correctAnswerIndex;
-
-    public Question(String text) {
-        this(text, new ArrayList<>());
-    }
-
-    public Question(String text, List<Answer> answers) {
+    protected Question(@NonNull String text) {
         this.text = text;
-        this.answers = answers;
-
-        if (answers.size() == 0 ||
-                correctAnswerIndex == -1) {
-            questionType = QuestionType.FREE_ANSWER;
-        }
-        else if (answers.size() == 1) {
-            questionType = QuestionType.STRING_ANSWER;
-        }
-        else {
-            questionType = QuestionType.NUM_ANSWER;
-        }
     }
 
     public boolean hasAnswers() {
-        return answers.size() != 0;
+        return !answers.isEmpty();
     }
 
-    // TODO: для всех преобразований вопросов в текст создать сервисы
-    public String getTextWithAnswers() {
-        var questionString = new StringBuilder();
-        questionString
-                .append(text)
-                .append(System.lineSeparator());
+    protected void addAnswer(@NonNull String text, @NonNull Boolean isCorrect) {
+        this.answers.put(new Answer(text), isCorrect);
+    }
 
-        if (questionType == QuestionType.NUM_ANSWER) {
-            // Do string like "1) answer_1; 2) answer_2; ...etc"
-            for (int i = 1; i <= answers.size(); i++) {
-                questionString
-                        .append(i)
-                        .append(") ")
-                        .append(answers.get(i - 1).getText())
-                        .append(System.lineSeparator());
-            }
-
+    public QuestionType getQuestionType() {
+        if (answers.isEmpty()) {
+            return QuestionType.FREE_ANSWER;
         }
-
-        return questionString.toString();
+        else if (answers.size() == 1) {
+            return QuestionType.STRING_ANSWER;
+        }
+        else {
+            return QuestionType.NUM_ANSWER;
+        }
     }
 
-    // TODO: для всех преобразований вопросов в текст создать сервисы
-    public String ask() {
-        var questionString = new StringBuilder();
-        questionString.append(getTextWithAnswers())
-                .append(
-                        questionType == QuestionType.NUM_ANSWER ?
-                                "Choose one of the suggested answers:" : "Type your answer:"
-                )
-                .append(System.lineSeparator());
-        return questionString.toString();
+    public List<Answer> getAnswers() {
+        return new ArrayList<>(answers.keySet());
     }
 
     public Answer getCorrectAnswer() {
-        return !hasCorrectAnswer() ?
-                answers.get(getCorrectAnswerIndex()) :
-                null;
-    }
-
-    // TODO: для всех преобразований вопросов в текст создать сервисы
-    public String getCorrectAnswerText() {
-        var answer = getCorrectAnswer();
-
-        if (questionType == QuestionType.NUM_ANSWER) {
-            return correctAnswerIndex.toString() +
-                    ") " +
-                    answers.get(correctAnswerIndex);
+        if (getQuestionType() == QuestionType.STRING_ANSWER) {
+            return answers.keySet().stream().findFirst().orElseThrow();
         }
         else {
-            return answers.get(correctAnswerIndex);
-        }
-    }
-
-    public boolean hasCorrectAnswer() {
-        return getCorrectAnswerIndex() != -1;
-    }
-
-    private int getCorrectAnswerIndex() {
-        if (correctAnswerIndex == null) {
-            correctAnswerIndex = -1;
-            for (int i = 0; i < answers.size(); i++) {
-                if (answers.get(i).isCorrect()) {
-                    correctAnswerIndex = i;
-                    break;
+            for (var answer : answers.keySet()) {
+                if (answers.get(answer)) {
+                    return answer;
                 }
             }
         }
-        return correctAnswerIndex;
+        return null;
     }
 }

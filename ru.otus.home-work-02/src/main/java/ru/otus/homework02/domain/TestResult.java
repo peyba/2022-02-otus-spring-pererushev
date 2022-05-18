@@ -1,62 +1,60 @@
 package ru.otus.homework02.domain;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Getter
+@RequiredArgsConstructor
 public class TestResult {
+    @Getter
     private final Student student;
-    private final Map<Question, String> answers;
+    @Getter
+    private final int successPercent;
+    private final Map<Question, Answer> answers = new HashMap<>();
 
-    public TestResult(Student student) {
-        this.student = student;
-        this.answers = new HashMap<>();
+    public Iterable<Question> getQuestions() {
+        return answers.keySet();
     }
 
-    public void addAnswer(Question question, String answer) {
+    public Answer getAnswer(Question question) {
+        return answers.get(question);
+    }
+
+    public void addAnswer(Question question, Answer answer) {
         answers.put(question, answer);
     }
 
-    @Override
-    public String toString() {
-        var sb = new StringBuilder();
+    public boolean isCorrectAnswerForQuestion(Question question) {
+        var studentAnswer = answers.get(question);
+        var correctAnswers = question.getCorrectAnswer();
 
-        sb.append("Test result of student ")
-                .append(student)
-                .append('\n');
+        return studentAnswer.equals(correctAnswers);
+    }
 
+    public int getCorrectAnswersCount() {
+        int i = 0;
         for (var question : answers.keySet()) {
-            sb.append("Question is: ")
-                    .append(question.getText())
-                    .append('\n')
-                    .append("your answer is: ");
-
-            if (question.getQuestionType() == QuestionType.NUM_ANSWER) {
-                int answerIndex = Integer.parseInt(answers.get(question)) - 1;
-                sb.append(answerIndex)
-                        .append(") "); // TODO: очень часто приходится это делать. нужно поместить эту логику в класс Question
-                if (question.getAnswers().size() > answerIndex) {
-                    sb.append(question.getAnswers().get(answerIndex));
-                }
-                else {
-                    sb.append("...");
-                }
+            if (isCorrectAnswerForQuestion(question)) {
+                i++;
             }
-            else {
-                sb.append(answers.get(question));
-            }
+        }
+        return i;
+    }
 
-            if (question.hasCorrectAnswer()) {
-                sb.append('\n')
-                        .append("correct answer is: ")
-                        .append(question.getCorrectAnswer());
-            }
-
-            sb.append("\n\n");
+    public int getCorrectAnswersPercent() {
+        if (answers.keySet().size() == 0) {
+            return 100; // нет вопросов - нет проблем
         }
 
-        return sb.toString();
+        var questionsCount = ((Integer) answers.keySet().size()).doubleValue();
+        var correctAnswersCount = ((Integer) getCorrectAnswersCount()).doubleValue();
+
+        return (int) ((100.00 / questionsCount) * correctAnswersCount);
+    }
+
+    public boolean isPassTest() {
+        return getCorrectAnswersPercent() >= successPercent;
     }
 }

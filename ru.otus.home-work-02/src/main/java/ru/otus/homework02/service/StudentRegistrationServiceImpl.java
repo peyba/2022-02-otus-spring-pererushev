@@ -1,23 +1,26 @@
 package ru.otus.homework02.service;
 
+import lombok.RequiredArgsConstructor;
 import ru.otus.homework02.dao.StudentDao;
 import ru.otus.homework02.domain.Student;
 
 import java.util.Scanner;
 
+@RequiredArgsConstructor
 public class StudentRegistrationServiceImpl implements StudentRegistrationService {
+    
+    private static final String GREETING = "Hello!";
+    private static final String ASL_F_NAME = "Enter your first name, please:";
+    private static final String ASL_S_NAME = "Enter your second name, please:";
 
     private final StudentDao studentDao;
-
-    public StudentRegistrationServiceImpl(StudentDao studentDao) {
-        this.studentDao = studentDao;
-    }
+    private final IOService ioService;
 
     @Override
     public Student registrationStudent() {
-        System.out.println("Hello!");
-        var firstName = askQuestion("Enter your first name, please:");
-        var secondName = askQuestion("Enter your second name, please:");
+        ioService.writeLine(GREETING);
+        var firstName = askQuestion(ASL_F_NAME);
+        var secondName = askQuestion(ASL_S_NAME);
 
         return studentDao.save(firstName, secondName);
     }
@@ -25,8 +28,8 @@ public class StudentRegistrationServiceImpl implements StudentRegistrationServic
     public String askQuestion(String question) {
         String answer = "";
         while (answer.isEmpty()) {
-            System.out.println(question);
-            answer = new Scanner(System.in).nextLine();
+            ioService.writeLine(question);
+            answer = ioService.readLine();
         }
 
         return answer;

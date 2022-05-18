@@ -11,15 +11,6 @@ import ru.otus.homework02.service.*;
 public class App {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
-
-        var studentRegistrationService = context.getBean(StudentRegistrationService.class);
-        var studentTestingService = context.getBean(StudentTestingService.class);
-
-        var student = studentRegistrationService.registrationStudent();
-        var testResult = studentTestingService.startTest(student);
-
-        System.out.println(testResult);
-
-        System.out.println("End.");
+        context.getBean(QuizService.class).run();
     }
 }

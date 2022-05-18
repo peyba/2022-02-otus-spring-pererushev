@@ -4,5 +4,5 @@ import ru.otus.homework02.domain.Student;
 import ru.otus.homework02.domain.TestResult;
 
 public interface StudentTestingService {
-    TestResult startTest(Student student);
+    TestResult startTest(Student student, int successPercent);
 }

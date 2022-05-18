@@ -2,6 +2,7 @@ package ru.otus.homework02.dao;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import org.springframework.core.io.Resource;
 import ru.otus.homework02.domain.Question;
 import ru.otus.homework02.service.QuestionParser;
 
@@ -12,12 +13,15 @@ import java.util.List;
 
 public class QuestionDaoCsv implements QuestionDao {
 
-    private final File file;
-    private final boolean hasHeader;
-    private final QuestionParser parser;
+    private static final String FILE_NOT_EXISTS_ERROR = "Error! File does not exist. Filename: ";
+    private static final String READING_FILE_ERROR = "Reading file error: ";
 
-    public QuestionDaoCsv(String filePath, QuestionParser parser, boolean hasHeader) {
-        this.file = new File(filePath);
+    private final Resource resource;
+    private final QuestionParser parser;
+    private final boolean hasHeader;
+
+    public QuestionDaoCsv(Resource resource, QuestionParser parser, boolean hasHeader) {
+        this.resource = resource;
         this.parser = parser;
         this.hasHeader = hasHeader;
     }
@@ -26,10 +30,9 @@ public class QuestionDaoCsv implements QuestionDao {
         var questions = new ArrayList<Question>();
         CSVReader reader;
         try {
-            reader = new CSVReader(new InputStreamReader(new FileInputStream(file)));
+            reader = new CSVReader(new InputStreamReader(resource.getInputStream()));
         } catch (IOException e) {
-            System.out.printf("Error! File \"%s\" does not exist.\n", file.getAbsolutePath());
-            return null;
+            throw new CannotGetQuestionsException(FILE_NOT_EXISTS_ERROR + resource.getFilename());
         }
 
         try {
@@ -43,9 +46,7 @@ public class QuestionDaoCsv implements QuestionDao {
             }
         }
         catch (CsvValidationException | IOException e) {
-            // TODO: добавить пользовательское исключение
-            e.printStackTrace();
-            return null;
+            throw new CannotGetQuestionsException(READING_FILE_ERROR + e.getMessage());
         }
         return questions;
     }
