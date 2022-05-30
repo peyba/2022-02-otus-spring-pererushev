@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: "jdbc:h2:mem:library;MODE=PostgreSQL"
+    driver-class-name: org.h2.Driver
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master-test.xml
+
+  main:
+    allow-circular-references: true
