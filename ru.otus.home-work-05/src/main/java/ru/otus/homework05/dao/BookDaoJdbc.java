@@ -2,7 +2,7 @@ package ru.otus.homework05.dao;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -11,21 +11,18 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.homework05.domain.Author;
 import ru.otus.homework05.domain.Book;
+import ru.otus.homework05.domain.Genre;
 
+import javax.validation.constraints.NotNull;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Repository
 public class BookDaoJdbc implements BookDao {
 
     private final NamedParameterJdbcOperations jdbc;
-    private final GenreDao genreDao;
-    private final AuthorDao authorDao;
 
     @Override
     @Transactional
@@ -50,17 +47,24 @@ public class BookDaoJdbc implements BookDao {
 
     @Override
     public Optional<Book> findById(Long id) {
-        try {
-            return Optional.ofNullable(
-                    jdbc.queryForObject(
-                            "SELECT id, name, genre_id FROM public.book WHERE id = :id",
-                            Map.of("id", id),
-                            new BookMapper()
-                    )
-            );
-        } catch (DataAccessException e) {
+        var books = jdbc.query(
+                "SELECT B.id, B.name, " +
+                        "G.id AS genre_id, G.code AS genre_code, G.name_eng AS genre_name_eng, G.name_rus AS genre_name_rus, " +
+                        "A.id AS author_id, A.first_name AS author_first_name, A.second_name AS author_second_name " +
+                        "FROM public.book B " +
+                        "INNER JOIN public.genre G ON G.id = B.genre_id " +
+                        "LEFT JOIN public.book_authors BA ON BA.book_id = B.id " +
+                        "LEFT JOIN public.author A ON A.id = BA.author_id " +
+                        "WHERE B.id = :id",
+                Map.of("id", id),
+                new BookResultSetExtractor()
+        );
+
+        if (books == null) {
             return Optional.empty();
         }
+
+        return books.stream().findFirst();
     }
 
     @Override
@@ -75,17 +79,30 @@ public class BookDaoJdbc implements BookDao {
     @Override
     public List<Book> findAll() {
         return jdbc.query(
-                "SELECT id, name, genre_id FROM public.book",
-                new BookMapper()
+                "SELECT B.id, B.name, " +
+                        "G.id AS genre_id, G.code AS genre_code, G.name_eng AS genre_name_eng, G.name_rus AS genre_name_rus, " +
+                        "A.id AS author_id, A.first_name AS author_first_name, A.second_name AS author_second_name " +
+                        "FROM public.book B " +
+                        "INNER JOIN public.genre G ON G.id = B.genre_id " +
+                        "LEFT JOIN public.book_authors BA ON BA.book_id = B.id " +
+                        "LEFT JOIN public.author A ON A.id = BA.author_id ",
+                new BookResultSetExtractor()
         );
     }
 
     @Override
     public List<Book> findAllById(Iterable<Long> ids) {
         return jdbc.query(
-                "SELECT id, name, genre_id FROM public.book WHERE id IN(:id)",
-                Map.of("id", ids),
-                new BookMapper()
+                "SELECT B.id, B.name, " +
+                        "G.id AS genre_id, G.code AS genre_code, G.name_eng AS genre_name_eng, G.name_rus AS genre_name_rus, " +
+                        "A.id AS author_id, A.first_name AS author_first_name, A.second_name AS author_second_name " +
+                        "FROM public.book B " +
+                        "INNER JOIN public.genre G ON G.id = B.genre_id " +
+                        "LEFT JOIN public.book_authors BA ON BA.book_id = B.id " +
+                        "LEFT JOIN public.author A ON A.id = BA.author_id " +
+                        "WHERE B.id IN(:ids)",
+                Map.of("ids", ids),
+                new BookResultSetExtractor()
         );
     }
 
@@ -162,6 +179,14 @@ public class BookDaoJdbc implements BookDao {
         );
     }
 
+    private List<Long> findAllBoorAuthorsIdsById(List<Long> ids) {
+        return jdbc.queryForList(
+                "SELECT author_id FROM public.book_authors WHERE book_id IN(:ids)",
+                Map.of("ids", ids),
+                Long.class
+        );
+    }
+
     private Book insert(Book book) {
         KeyHolder kh = new GeneratedKeyHolder();
         jdbc.update(
@@ -211,30 +236,66 @@ public class BookDaoJdbc implements BookDao {
         );
     }
 
-    private void deleteAllAuthorsLinkById(List<Long> ids){
+    private void deleteAllAuthorsLinkById(List<Long> ids) {
         jdbc.update(
                 "DELETE FROM public.book_authors WHERE book_id IN(:ids)",
                 Map.of("ids", ids)
         );
     }
 
-    private void deleteAllAuthorsLink(){
+    private void deleteAllAuthorsLink() {
         jdbc.update(
                 "DELETE FROM public.book_authors",
                 Map.of()
         );
     }
 
-    private class BookMapper implements RowMapper<Book> {
+    private static class BookResultSetExtractor implements ResultSetExtractor<List<Book>> {
         @Override
-        public Book mapRow(ResultSet rs, int rowNum) throws SQLException {
-            var genre = genreDao.findById(rs.getLong("genre_id")).orElseThrow();
-            var authors = authorDao.findAllById(getBoorAuthorsIdsById(rs.getLong("id")));
+        @NotNull
+        public List<Book> extractData(ResultSet rs) throws SQLException, DataAccessException {
+            var bookMap = new HashMap<Long, Book>();
+
+            while (rs.next()) {
+                var bookId = rs.getLong("id");
+
+                if (!bookMap.containsKey(rs.getLong("id"))) {
+                    bookMap.put(bookId, createBookFromResultSet(rs));
+                }
+
+                if (hasAuthor(rs)) {
+                    bookMap.get(bookId).getAuthors().add(createAuthorFromResultSet(rs));
+                }
+            }
+
+            return List.copyOf(bookMap.values());
+        }
+
+        private boolean hasAuthor(ResultSet rs) throws SQLException {
+            return rs.getObject("author_id", Long.class) != null;
+        }
+
+        private Book createBookFromResultSet(ResultSet rs) throws SQLException {
             return new Book()
                     .setId(rs.getLong("id"))
                     .setName(rs.getString("name"))
-                    .setGenre(genre)
-                    .setAuthors(authors);
+                    .setGenre(createGenreFromResultSet(rs))
+                    .setAuthors(new ArrayList<>());
+        }
+
+        private Genre createGenreFromResultSet(ResultSet rs) throws SQLException {
+            return new Genre()
+                    .setId(rs.getLong("genre_id"))
+                    .setCode(rs.getString("genre_code"))
+                    .setNameEng(rs.getString("genre_name_eng"))
+                    .setNameRus(rs.getString("genre_name_rus"));
+        }
+
+        private Author createAuthorFromResultSet(ResultSet rs) throws SQLException {
+            return new Author()
+                    .setId(rs.getLong("author_id"))
+                    .setFirstName(rs.getString("author_first_name"))
+                    .setSecondName(rs.getString("author_second_name"));
         }
     }
 }
