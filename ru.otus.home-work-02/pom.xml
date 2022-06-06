@@ -6,7 +6,7 @@
 
     <groupId>ru.otus</groupId>
     <artifactId>ru.otus.home-work-02</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -19,6 +19,8 @@
         <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
         <junit-jupiter-api.version>5.8.2</junit-jupiter-api.version>
         <junit-jupiter-engine.version>5.8.2</junit-jupiter-engine.version>
+        <spring-boot-starter-test.version>2.6.7</spring-boot-starter-test.version>
+        <spring-boot-starter-actuator.version>2.6.6</spring-boot-starter-actuator.version>
     </properties>
 
     <dependencies>
@@ -37,13 +39,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>2.6.7</version>
+            <version>${spring-boot-starter-test.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
-            <version>2.6.6</version>
+            <version>${spring-boot-starter-actuator.version}</version>
         </dependency>
 
         <dependency>
