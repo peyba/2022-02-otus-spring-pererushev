@@ -1,6 +1,6 @@
-package ru.otus.homework02.domain;
+package ru.otus.homework02.service;
 
-public class CreatingQuestionException extends RuntimeException {
+public class CreatingQuestionException extends ServiceException {
 
     public CreatingQuestionException() {
         super();

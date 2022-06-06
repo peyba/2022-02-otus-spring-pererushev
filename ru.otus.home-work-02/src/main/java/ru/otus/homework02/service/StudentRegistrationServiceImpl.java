@@ -1,12 +1,12 @@
 package ru.otus.homework02.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import ru.otus.homework02.dao.StudentDao;
 import ru.otus.homework02.domain.Student;
 
-import java.util.Scanner;
-
 @RequiredArgsConstructor
+@Component
 public class StudentRegistrationServiceImpl implements StudentRegistrationService {
     
     private static final String GREETING = "Hello!";

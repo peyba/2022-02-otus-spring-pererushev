@@ -1,11 +1,13 @@
 package ru.otus.homework02.service.write;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import ru.otus.homework02.domain.Answer;
 import ru.otus.homework02.domain.Question;
 import ru.otus.homework02.domain.TestResult;
+import ru.otus.homework02.service.TestResultService;
 
-@RequiredArgsConstructor
+@Component
 public class WriteTestResultService implements WriteService<TestResult> {
 
     private static final String TEST_RESULT_SEPARATOR = "-----------------------------------------------------------------------" +
@@ -22,6 +24,17 @@ public class WriteTestResultService implements WriteService<TestResult> {
 
     private final WriteService<Question> writeQuestionService;
     private final WriteService<Answer> answerWriteService;
+    private final TestResultService testResultService;
+
+    public WriteTestResultService(
+            @Qualifier("writeQuestionCorrectAnswersService") WriteService<Question> writeQuestionService,
+            @Qualifier("writeAnswerServiceImpl") WriteService<Answer> answerWriteService,
+            TestResultService testResultService
+    ) {
+        this.writeQuestionService = writeQuestionService;
+        this.answerWriteService = answerWriteService;
+        this.testResultService = testResultService;
+    }
 
     @Override
     public String write(TestResult testResult) {
@@ -47,7 +60,7 @@ public class WriteTestResultService implements WriteService<TestResult> {
         result
                 .append(System.lineSeparator())
                 .append(CORRECT_ANSWERS_PERCENT)
-                .append(testResult.getCorrectAnswersPercent())
+                .append(testResultService.getCorrectAnswersPercent(testResult))
                 .append(System.lineSeparator())
                 .append(getTestResultText(testResult));
 
@@ -56,11 +69,11 @@ public class WriteTestResultService implements WriteService<TestResult> {
 
     private String getAnswerCorrectnessText(TestResult testResult, Question question) {
         return "(" +
-                (testResult.isCorrectAnswerForQuestion(question) ? "+" : "-") +
+                (testResultService.isCorrectAnswerForQuestion(testResult, question) ? "+" : "-") +
                 ")";
     }
 
     private String getTestResultText(TestResult testResult) {
-        return testResult.isPassTest() ? TEST_PASSED : TEST_FAILED;
+        return testResultService.isPassTest(testResult) ? TEST_PASSED : TEST_FAILED;
     }
 }

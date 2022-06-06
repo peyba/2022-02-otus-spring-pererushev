@@ -1,11 +1,12 @@
 package ru.otus.homework02.service;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import ru.otus.homework02.dao.QuestionDao;
 import ru.otus.homework02.domain.*;
 import ru.otus.homework02.service.write.WriteQuestionService;
 
-@RequiredArgsConstructor
+@Component
 public class StudentTestingServiceImpl implements StudentTestingService {
 
     private static final String NOT_NUMERIC_ERROR = "Not numeric answer! Choose one of the suggested answers:";
@@ -15,11 +16,24 @@ public class StudentTestingServiceImpl implements StudentTestingService {
     private final QuestionDao questionDao;
     private final IOService ioService;
     private final WriteQuestionService writeQuestionService;
+    private final QuestionService getQuestionType;
+
+    public StudentTestingServiceImpl(
+            QuestionDao questionDao,
+            IOService ioService,
+            @Qualifier("writeQuestionForQuizService") WriteQuestionService writeQuestionService,
+            QuestionService getQuestionType
+    ) {
+        this.questionDao = questionDao;
+        this.ioService = ioService;
+        this.writeQuestionService = writeQuestionService;
+        this.getQuestionType = getQuestionType;
+    }
 
     @Override
-    public TestResult startTest(Student student, int successPercent) {
+    public TestResult startTest(Student student) {
         ioService.writeLine("Start testing. Please, answer the questions:");
-        var testResult = new TestResult(student, successPercent);
+        var testResult = new TestResult(student);
 
         var questions =  questionDao.getAll();
 
@@ -47,7 +61,7 @@ public class StudentTestingServiceImpl implements StudentTestingService {
                 continue;
             }
 
-            if (question.getQuestionType() == QuestionType.NUM_ANSWER) {
+            if (getQuestionType.getQuestionType(question) == QuestionType.NUM_ANSWER) {
                 try {
                     int answerIndex = Integer.parseInt(answerText) - 1;
                     return question.getAnswers().get(answerIndex);

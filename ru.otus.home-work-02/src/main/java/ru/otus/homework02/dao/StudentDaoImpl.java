@@ -1,10 +1,12 @@
 package ru.otus.homework02.dao;
 
+import org.springframework.stereotype.Repository;
 import ru.otus.homework02.domain.Student;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Repository
 public class StudentDaoImpl implements StudentDao {
 
     private final Map<String, Student> students;

@@ -2,7 +2,9 @@ package ru.otus.homework02.dao;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Repository;
 import ru.otus.homework02.domain.Question;
 import ru.otus.homework02.service.QuestionParser;
 
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Repository
 public class QuestionDaoCsv implements QuestionDao {
 
     private static final String FILE_NOT_EXISTS_ERROR = "Error! File does not exist. Filename: ";
@@ -20,7 +23,7 @@ public class QuestionDaoCsv implements QuestionDao {
     private final QuestionParser parser;
     private final boolean hasHeader;
 
-    public QuestionDaoCsv(Resource resource, QuestionParser parser, boolean hasHeader) {
+    public QuestionDaoCsv(Resource resource, QuestionParser parser, @Value("${testing.has-header}") boolean hasHeader) {
         this.resource = resource;
         this.parser = parser;
         this.hasHeader = hasHeader;

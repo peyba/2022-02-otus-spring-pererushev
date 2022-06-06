@@ -1,6 +1,6 @@
 package ru.otus.homework02.service;
 
-public class IncorrectCsvQuestionFileFormatException extends RuntimeException {
+public class IncorrectCsvQuestionFileFormatException extends ServiceException {
 
     public IncorrectCsvQuestionFileFormatException() {}
 
