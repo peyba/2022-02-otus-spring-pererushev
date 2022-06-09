@@ -1,0 +1,9 @@
+book-new
+book-name-set "test 1"
+book-genre-set 1
+book-author-add 1
+book-author-add 2
+book-comment-add "text 1"
+book-comment-add "text 2"
+book-save
+books
