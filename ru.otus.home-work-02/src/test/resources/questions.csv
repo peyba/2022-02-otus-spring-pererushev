@@ -1,0 +1,6 @@
+question,answer_a,answer_b,answer_c,answer_d
+1+1,4,,,
+2+2,1,2,3,*4
+3+3,2,*6,,
+4+4,*8,,,
+5+5,10,10,10,*10
