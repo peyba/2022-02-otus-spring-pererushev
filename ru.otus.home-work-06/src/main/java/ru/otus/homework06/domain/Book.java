@@ -40,7 +40,7 @@ public class Book {
     @Column(nullable = false)
     private Set<Author> authors;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @Fetch(value = FetchMode.SUBSELECT)
     @Column(nullable = false)
     private Set<BookComment> bookComments;
@@ -52,7 +52,6 @@ public class Book {
                 ", name='" + name + '\'' +
                 ", genre=" + genre +
                 ", authors=" + authors +
-                ", bookComments=" + bookComments +
                 '}';
     }
 

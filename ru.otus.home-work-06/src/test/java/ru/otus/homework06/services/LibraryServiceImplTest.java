@@ -15,7 +15,6 @@ import ru.otus.homework06.domain.Book;
 import ru.otus.homework06.domain.BookComment;
 import ru.otus.homework06.domain.Genre;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -58,10 +57,15 @@ class LibraryServiceImplTest {
     private static final String SECOND_BOOK_COMMENT3 = "Got it.";
 
     @Autowired
-    private LibraryService library;
+    private LibraryBookService libraryBookService;
+    @Autowired
+    private LibraryAuthorService libraryAuthorService;
+    @Autowired
+    private LibraryGenreService libraryGenreService;
 
     @Test
     @DisplayName("Проверяем сохранение книги")
+    @Transactional
     @Rollback
     void saveBook() {
         var newBook = new Book()
@@ -69,21 +73,23 @@ class LibraryServiceImplTest {
                 .setGenre(getGenreForTest())
                 .setAuthors(getAuthorsListForTest());
 
-        assertNotNull(library.saveBook(newBook).getId());
+        assertNotNull(libraryBookService.save(newBook).getId());
 
-        library.deleteBookById(library.saveBook(newBook).getId());
+        //libraryBookService.deleteById(libraryBookService.save(newBook).getId());
     }
 
     @Test
+    @Transactional
     @DisplayName("Проверяем получение всех книг")
     void getAllBooks() {
-        assertEquals(FIND_ALL_EXPECTED_RESULT_COUNT, library.getAllBooks().size());
-        assertEquals(2, library.getAllBooks().get(0).getBookComments().size());
+        assertEquals(FIND_ALL_EXPECTED_RESULT_COUNT, libraryBookService.getAll().size());
+        assertEquals(2, libraryBookService.getAll().get(0).getBookComments().size());
     }
 
     @Test
+    @Transactional
     @DisplayName("Проверяем поиск книги по ID")
-    void findBookById() {
+    void findById() {
         var expectedBook = Optional.ofNullable(
                 new Book()
                         .setId(FIRST_BOOK_ID)
@@ -93,25 +99,25 @@ class LibraryServiceImplTest {
                         .setBookComments(getCommentsForBook(FIRST_BOOK_ID))
         );
 
-        var book = library.findBookById(FIRST_BOOK_ID);
+        var book = libraryBookService.findById(FIRST_BOOK_ID);
         assertEquals(expectedBook, book);
     }
 
     @Test
     @DisplayName("Проверяем удаление книги")
     @Rollback
-    void deleteBookById() {
-        assertTrue(library.findBookById(FIRST_BOOK_ID).isPresent());
+    void deleteById() {
+        assertTrue(libraryBookService.findById(FIRST_BOOK_ID).isPresent());
 
-        library.deleteBookById(FIRST_BOOK_ID);
+        libraryBookService.deleteById(FIRST_BOOK_ID);
 
-        assertTrue(library.findBookById(FIRST_BOOK_ID).isEmpty());
+        assertTrue(libraryBookService.findById(FIRST_BOOK_ID).isEmpty());
     }
 
     @Test
     @DisplayName("Проверяем получение всех жанров")
     void getAllGenres() {
-        assertEquals(GENRES_COUNT, library.getAllGenres().size());
+        assertEquals(GENRES_COUNT, libraryGenreService.getAll().size());
     }
 
     @Test
@@ -119,13 +125,13 @@ class LibraryServiceImplTest {
     void findGenreById() {
         var expectedGenre = Optional.ofNullable(getGenreForTest());
 
-        assertEquals(expectedGenre, library.findGenreById(GENRE_ID));
+        assertEquals(expectedGenre, libraryGenreService.findById(GENRE_ID));
     }
 
     @Test
     @DisplayName("Проверяем получение всех авторов")
     void getAllAuthors() {
-        assertEquals(AUTHORS_COUNT, library.getAllAuthors().size());
+        assertEquals(AUTHORS_COUNT, libraryAuthorService.getAll().size());
     }
 
     @Test
@@ -138,7 +144,7 @@ class LibraryServiceImplTest {
                         .setSecondName(FIRST_AUTHOR_NAME)
         );
 
-        assertEquals(expectedAuthor, library.findAuthorById(FIRST_AUTHOR_ID));
+        assertEquals(expectedAuthor, libraryAuthorService.findById(FIRST_AUTHOR_ID));
     }
 
     private Set<Author> getAuthorsListForTest() {
@@ -156,13 +162,13 @@ class LibraryServiceImplTest {
 
     private Set<BookComment> getCommentsForBook(Long bookId) {
         if (bookId.equals(FIRST_BOOK_ID)) {
-            var book = library.findBookById(FIRST_BOOK_ID).orElseThrow();
+            var book = libraryBookService.findById(FIRST_BOOK_ID).orElseThrow();
             return Set.of(
                     new BookComment().setId(FIRST_BOOK_COMMENT1_ID).setBook(book).setText(FIRST_BOOK_COMMENT1),
                     new BookComment().setId(FIRST_BOOK_COMMENT2_ID).setBook(book).setText(FIRST_BOOK_COMMENT2)
             );
         } else if (bookId.equals(SECOND_BOOK_ID)) {
-            var book = library.findBookById(SECOND_BOOK_ID).orElseThrow();
+            var book = libraryBookService.findById(SECOND_BOOK_ID).orElseThrow();
             return Set.of(
                     new BookComment().setId(SECOND_BOOK_COMMENT1_ID).setBook(book).setText(SECOND_BOOK_COMMENT1),
                     new BookComment().setId(SECOND_BOOK_COMMENT2_ID).setBook(book).setText(SECOND_BOOK_COMMENT2),

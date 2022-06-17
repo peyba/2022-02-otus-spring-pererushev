@@ -1,6 +1,7 @@
 package ru.otus.homework06.repository;
 
-import org.springframework.stereotype.Repository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import ru.otus.homework06.domain.Author;
 
 import javax.persistence.EntityManager;
@@ -8,15 +9,12 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+@Component
+@RequiredArgsConstructor
 public class AuthorRepositoryJpa implements AuthorRepository {
 
     @PersistenceContext
     private final EntityManager em;
-
-    public AuthorRepositoryJpa(EntityManager em) {
-        this.em = em;
-    }
 
     @Override
     public List<Author> findAll() {

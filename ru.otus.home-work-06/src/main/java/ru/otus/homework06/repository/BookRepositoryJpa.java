@@ -1,21 +1,19 @@
 package ru.otus.homework06.repository;
 
-import org.springframework.stereotype.Repository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import ru.otus.homework06.domain.Book;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.*;
 
-@Repository
+@Component
+@RequiredArgsConstructor
 public class BookRepositoryJpa implements BookRepository {
 
     @PersistenceContext
     private final EntityManager em;
-
-    public BookRepositoryJpa(EntityManager em) {
-        this.em = em;
-    }
 
     @Override
     public Book save(Book book) {
@@ -49,13 +47,13 @@ public class BookRepositoryJpa implements BookRepository {
 
     @Override
     public List<Book> findAll() {
-        return em.createQuery("SELECT DISTINCT b FROM Book b JOIN FETCH b.genre g", Book.class)
+        return em.createQuery("SELECT b FROM Book b JOIN FETCH b.genre g", Book.class)
                 .getResultList();
     }
 
     @Override
     public List<Book> findAllById(Iterable<Long> ids) {
-        return em.createQuery("SELECT DISTINCT b FROM Book b JOIN FETCH b.genre g WHERE b.id in(:ids)", Book.class)
+        return em.createQuery("SELECT b FROM Book b JOIN FETCH b.genre g WHERE b.id in(:ids)", Book.class)
                 .setParameter("ids", ids)
                 .getResultList();
     }
@@ -68,7 +66,7 @@ public class BookRepositoryJpa implements BookRepository {
 
     @Override
     public void deleteById(Long id) {
-        deleteAllById(List.of(id));
+        findById(id).ifPresent(em::remove);
     }
 
     @Override

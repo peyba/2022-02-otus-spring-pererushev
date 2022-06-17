@@ -159,6 +159,7 @@ class BookCommentRepositoryJpaTest {
         assertNotNull(em.find(BookComment.class, FIRST_BOOK_COMMENT1_ID));
 
         repository.deleteById(FIRST_BOOK_COMMENT1_ID);
+        em.flush();
         em.clear();
 
         assertNull(em.find(BookComment.class, FIRST_BOOK_COMMENT1_ID));

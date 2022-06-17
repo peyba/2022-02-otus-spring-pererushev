@@ -1,6 +1,7 @@
 package ru.otus.homework06.repository;
 
-import org.springframework.stereotype.Repository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import ru.otus.homework06.domain.BookComment;
 
 import javax.persistence.EntityManager;
@@ -9,15 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+@Component
+@RequiredArgsConstructor
 public class BookCommentRepositoryJpa implements BookCommentRepository {
 
     @PersistenceContext
     private final EntityManager em;
-
-    public BookCommentRepositoryJpa(EntityManager em) {
-        this.em = em;
-    }
 
     @Override
     public BookComment save(BookComment comment) {
@@ -69,9 +67,7 @@ public class BookCommentRepositoryJpa implements BookCommentRepository {
 
     @Override
     public void deleteById(Long id) {
-        em.createQuery("DELETE FROM BookComment c WHERE c.id = :id")
-                .setParameter("id", id)
-                .executeUpdate();
+        findById(id).ifPresent(em::remove);
     }
 
     @Override

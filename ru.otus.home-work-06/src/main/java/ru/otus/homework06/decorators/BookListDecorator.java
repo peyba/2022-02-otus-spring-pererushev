@@ -16,7 +16,6 @@ public class BookListDecorator extends AbstractEntityListDecorator<Book> {
         columns.put("name", 25);
         columns.put("genre", 25);
         columns.put("author", 50);
-        columns.put("comments", 8);
         return columns;
     }
 
@@ -27,7 +26,6 @@ public class BookListDecorator extends AbstractEntityListDecorator<Book> {
         booksPrintMap.put("name", book.getName());
         booksPrintMap.put("genre", getGenreString(book.getGenre()));
         booksPrintMap.put("author", getAuthorsString(book.getAuthors()));
-        booksPrintMap.put("comments", book.getBookComments().size());
         return booksPrintMap;
     }
 

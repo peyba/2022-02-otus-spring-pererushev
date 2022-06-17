@@ -1,7 +1,7 @@
 package ru.otus.homework06.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import ru.otus.homework06.domain.Genre;
 
 import javax.persistence.EntityManager;
@@ -9,8 +9,8 @@ import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
 
+@Component
 @RequiredArgsConstructor
-@Repository
 public class GenreRepositoryJpa implements GenreRepository {
 
     @PersistenceContext
