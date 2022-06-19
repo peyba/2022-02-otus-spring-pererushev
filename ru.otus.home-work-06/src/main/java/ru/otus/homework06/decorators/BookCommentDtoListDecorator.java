@@ -1,14 +1,14 @@
 package ru.otus.homework06.decorators;
 
 import org.springframework.stereotype.Component;
-import ru.otus.homework06.domain.BookComment;
+import ru.otus.homework06.dto.BookCommentDto;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Component
-public class BookCommentListDecorator extends AbstractEntityListDecorator<BookComment> {
+public class BookCommentDtoListDecorator extends AbstractEntityListDecorator<BookCommentDto> {
     @Override
     protected Map<String, Integer> columns() {
         Map<String, Integer> columns = new LinkedHashMap<>();
@@ -20,12 +20,10 @@ public class BookCommentListDecorator extends AbstractEntityListDecorator<BookCo
     }
 
     @Override
-    protected Map<String, Object> mapEntity(BookComment comment) {
+    protected Map<String, Object> mapEntity(BookCommentDto bookCommentDto) {
         Map<String, Object> booksPrintMap = new HashMap<>();
-        booksPrintMap.put("book_id", comment.getBook().getId());
-        booksPrintMap.put("book_name", comment.getBook().getName());
-        booksPrintMap.put("id", comment.getId());
-        booksPrintMap.put("text", comment.getText());
+        booksPrintMap.put("id", bookCommentDto.getId());
+        booksPrintMap.put("text", bookCommentDto.getText());
         return booksPrintMap;
     }
 }

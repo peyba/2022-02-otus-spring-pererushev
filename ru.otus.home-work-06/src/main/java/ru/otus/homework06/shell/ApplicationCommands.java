@@ -6,10 +6,7 @@ import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellMethodAvailability;
 import ru.otus.homework06.decorators.EntityListDecorator;
-import ru.otus.homework06.domain.Author;
-import ru.otus.homework06.domain.Book;
-import ru.otus.homework06.domain.BookComment;
-import ru.otus.homework06.domain.Genre;
+import ru.otus.homework06.dto.*;
 import ru.otus.homework06.services.LibraryAuthorService;
 import ru.otus.homework06.services.LibraryBookService;
 import ru.otus.homework06.services.LibraryGenreService;
@@ -29,16 +26,16 @@ public class ApplicationCommands {
     private final LibraryBookService libraryBookService;
     private final LibraryAuthorService libraryAuthorService;
     private final LibraryGenreService libraryGenreService;
-    private final EntityListDecorator<Book> bookListDecorator;
-    private final EntityListDecorator<Genre> genreListDecorator;
-    private final EntityListDecorator<Author> authorListDecorator;
-    private final EntityListDecorator<BookComment> commentListDecorator;
+    private final EntityListDecorator<BookTitleDto> bookTitleDtoEntityListDecorator;
+    private final EntityListDecorator<GenreDto> genreListDecorator;
+    private final EntityListDecorator<AuthorDto> authorListDecorator;
+    private final EntityListDecorator<BookCommentDto> commentListDecorator;
 
     // region Book creating/editing mode
     @ShellMethod(value = "Save book and go in to the root mode", key = {"book-save"}, group = ".. Book creating/editing mode")
     @ShellMethodAvailability("isBookEditMode")
     public String saveBook() {
-        var bookObject = shellContext.getObject(BOOK_CONTEXT_OBJECT_KEY, Book.class);
+        var bookObject = shellContext.getObject(BOOK_CONTEXT_OBJECT_KEY, BookDto.class);
         var book = libraryBookService.save(bookObject);
         shellContext.drop();
         return book.toString() +
@@ -49,7 +46,7 @@ public class ApplicationCommands {
     @ShellMethod(value = "Set genre to the book", key = {"book-genre-set"}, group = ".. Book creating/editing mode")
     @ShellMethodAvailability("isBookEditMode")
     public String bookSetGenre(Long id) {
-        var bookObject = shellContext.getObject(BOOK_CONTEXT_OBJECT_KEY, Book.class);
+        var bookObject = shellContext.getObject(BOOK_CONTEXT_OBJECT_KEY, BookDto.class);
         var genre = libraryGenreService.findById(id);
         if (genre.isEmpty()) {
             return "Genre with id: " + id + " does not exists";
@@ -61,7 +58,7 @@ public class ApplicationCommands {
     @ShellMethod(value = "Set name to the book", key = {"book-name-set"}, group = ".. Book creating/editing mode")
     @ShellMethodAvailability("isBookEditMode")
     public String bookSetName(String name) {
-        var bookObject = shellContext.getObject(BOOK_CONTEXT_OBJECT_KEY, Book.class);
+        var bookObject = shellContext.getObject(BOOK_CONTEXT_OBJECT_KEY, BookDto.class);
         bookObject.setName(name);
         return getBookStatus();
     }
@@ -73,7 +70,7 @@ public class ApplicationCommands {
         if (author.isEmpty()) {
             return "Author with id = " + id + " does not exists";
         }
-        var bookObject = shellContext.getObject(BOOK_CONTEXT_OBJECT_KEY, Book.class);
+        var bookObject = shellContext.getObject(BOOK_CONTEXT_OBJECT_KEY, BookDto.class);
         if (bookObject.getAuthors() == null) {
             bookObject.setAuthors(new HashSet<>());
         }
@@ -84,15 +81,11 @@ public class ApplicationCommands {
     @ShellMethod(value = "Add comment to the book", key = {"book-comment-add"}, group = ".. Book creating/editing mode")
     @ShellMethodAvailability("isBookEditMode")
     public String bookAddComment(String comment) {
-        var bookObject = shellContext.getObject(BOOK_CONTEXT_OBJECT_KEY, Book.class);
+        var bookObject = shellContext.getObject(BOOK_CONTEXT_OBJECT_KEY, BookDto.class);
         if (bookObject.getBookComments() == null) {
             bookObject.setBookComments(new HashSet<>());
         }
-        bookObject.getBookComments().add(
-                new BookComment()
-                        .setBook(bookObject)
-                        .setText(comment)
-        );
+        bookObject.getBookComments().add(new BookCommentDto().setText(comment));
         return getBookStatus();
     }
 
@@ -100,7 +93,7 @@ public class ApplicationCommands {
     @ShellMethodAvailability("isBookEditMode")
     public String getBookStatus() {
         return shellContext.getObject(
-                BOOK_CONTEXT_OBJECT_KEY, Book.class).toString() +
+                BOOK_CONTEXT_OBJECT_KEY, BookDto.class).toString() +
                 System.lineSeparator() +
                 NOT_SAVED_STATUS;
     }
@@ -111,7 +104,7 @@ public class ApplicationCommands {
     @ShellMethod(value = "Book create mode on", key = {"book-add", "book-new"}, group = ". Common commands")
     @ShellMethodAvailability("isRoot")
     public void addBookMode() {
-        shellContext.addObject(BOOK_CONTEXT_OBJECT_KEY, new Book());
+        shellContext.addObject(BOOK_CONTEXT_OBJECT_KEY, new BookDto());
         shellContext.setContext(ShellContext.WorkingContext.CREATE_BOOK);
     }
 
@@ -130,7 +123,7 @@ public class ApplicationCommands {
 
     @ShellMethod(value = "Print all books", key = {"books"}, group = ". Common commands")
     public String getAllBooks() {
-        return bookListDecorator.decorate(libraryBookService.getAll());
+        return bookTitleDtoEntityListDecorator.decorate(libraryBookService.getAll());
     }
 
     @ShellMethod(value = "Search book by id", key = {"book-by-id", "book"}, group = ". Common commands")

@@ -1,10 +1,13 @@
 package ru.otus.homework06.services;
 
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import ru.otus.homework06.domain.Genre;
+import ru.otus.homework06.dto.GenreDto;
 import ru.otus.homework06.repository.GenreRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,14 +16,25 @@ import java.util.Optional;
 public class LibraryGenreServiceImpl implements LibraryGenreService {
 
     private final GenreRepository genreRepository;
+    private final ModelMapper modelMapper;
 
     @Override
-    public List<Genre> getAll() {
-        return genreRepository.findAll();
+    public List<GenreDto> getAll() {
+        List<GenreDto> genreDtoList = new ArrayList<>();
+        genreRepository.findAll().forEach(g -> genreDtoList.add(convertToGenreDto(g)));
+        return genreDtoList;
     }
 
     @Override
-    public Optional<Genre> findById(Long id) {
-        return genreRepository.findById(id);
+    public Optional<GenreDto> findById(Long id) {
+        var genre = genreRepository.findById(id);
+        if (genre.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(convertToGenreDto(genre.get()));
+    }
+
+    private GenreDto convertToGenreDto(Genre genre) {
+        return modelMapper.map(genre, GenreDto.class);
     }
 }

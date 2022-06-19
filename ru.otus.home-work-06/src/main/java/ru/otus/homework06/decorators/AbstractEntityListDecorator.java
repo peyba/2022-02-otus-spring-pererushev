@@ -15,6 +15,15 @@ public abstract class AbstractEntityListDecorator<T> implements EntityListDecora
     public String decorate(Iterable<T> entities) {
         var columns = columns();
         var stringBuilder = new StringBuilder();
+
+        if (hasTitle()) {
+            stringBuilder
+                    .append(getTitleLine(columns))
+                    .append(System.lineSeparator())
+                    .append(getTitleText(columns))
+                    .append(System.lineSeparator());
+        }
+
         stringBuilder
                 .append(getBorderLine(columns))
                 .append(System.lineSeparator())
@@ -40,6 +49,14 @@ public abstract class AbstractEntityListDecorator<T> implements EntityListDecora
 
     protected abstract Map<String, Object> mapEntity(T entity);
 
+    protected String getTitle() {
+        return "";
+    }
+
+    protected boolean hasTitle() {
+        return false;
+    }
+
     private String getTable(T entity, Map<String, Integer> columns) {
         var values = new ArrayList<>();
         var entityMap = mapEntity(entity);
@@ -53,6 +70,31 @@ public abstract class AbstractEntityListDecorator<T> implements EntityListDecora
         }
 
         return String.format(getFormatStringForLine(columns), values.toArray());
+    }
+
+    private String getTitleText(Map<String, Integer> columns) {
+        var titleText = getTitle();
+        int tableLength = 1;
+        for (var key : columns.keySet()) {
+            tableLength += columns.get(key) + 2;
+        }
+
+        return String.format(getFormatStringForLine(Map.of(titleText, tableLength)), titleText);
+    }
+
+    private String getTitleLine(Map<String, Integer> columns) {
+        var sb = new StringBuilder();
+        sb.append(CROSS);
+
+
+        for (var key : columns.keySet()) {
+            sb.append(HORIZONTAL_BORDER.repeat(columns.get(key) + 3));
+        }
+
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append(CROSS);
+
+        return sb.toString();
     }
 
     private String getBorderLine(Map<String, Integer> columns) {

@@ -1,14 +1,14 @@
 package ru.otus.homework06.decorators;
 
 import org.springframework.stereotype.Component;
-import ru.otus.homework06.domain.Genre;
+import ru.otus.homework06.dto.GenreDto;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Component
-public class GenreListDecorator extends AbstractEntityListDecorator<Genre> {
+public class GenreDtoListDecorator extends AbstractEntityListDecorator<GenreDto> {
     @Override
     protected Map<String, Integer> columns() {
         Map<String, Integer> columns = new LinkedHashMap<>();
@@ -20,12 +20,12 @@ public class GenreListDecorator extends AbstractEntityListDecorator<Genre> {
     }
 
     @Override
-    protected Map<String, Object> mapEntity(Genre genre) {
+    protected Map<String, Object> mapEntity(GenreDto genreDto) {
         Map<String, Object> genrePrintMap = new HashMap<>();
-        genrePrintMap.put("id", genre.getId());
-        genrePrintMap.put("code", genre.getCode());
-        genrePrintMap.put("name_eng", genre.getNameEng());
-        genrePrintMap.put("name_rus", genre.getNameRus());
+        genrePrintMap.put("id", genreDto.getId());
+        genrePrintMap.put("code", genreDto.getCode());
+        genrePrintMap.put("name_eng", genreDto.getNameEng());
+        genrePrintMap.put("name_rus", genreDto.getNameRus());
         return genrePrintMap;
     }
 }

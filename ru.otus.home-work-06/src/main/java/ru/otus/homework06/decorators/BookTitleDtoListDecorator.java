@@ -2,13 +2,16 @@ package ru.otus.homework06.decorators;
 
 import org.springframework.stereotype.Component;
 import ru.otus.homework06.domain.Author;
-import ru.otus.homework06.domain.Book;
 import ru.otus.homework06.domain.Genre;
+import ru.otus.homework06.dto.BookTitleDto;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Component
-public class BookListDecorator extends AbstractEntityListDecorator<Book> {
+public class BookTitleDtoListDecorator extends AbstractEntityListDecorator<BookTitleDto> {
     @Override
     protected Map<String, Integer> columns() {
         Map<String, Integer> columns = new LinkedHashMap<>();
@@ -20,13 +23,23 @@ public class BookListDecorator extends AbstractEntityListDecorator<Book> {
     }
 
     @Override
-    protected Map<String, Object> mapEntity(Book book) {
+    protected Map<String, Object> mapEntity(BookTitleDto book) {
         Map<String, Object> booksPrintMap = new HashMap<>();
         booksPrintMap.put("id", book.getId());
         booksPrintMap.put("name", book.getName());
         booksPrintMap.put("genre", getGenreString(book.getGenre()));
         booksPrintMap.put("author", getAuthorsString(book.getAuthors()));
         return booksPrintMap;
+    }
+
+    @Override
+    protected String getTitle() {
+        return "Books";
+    }
+
+    @Override
+    protected boolean hasTitle() {
+        return true;
     }
 
     private String getAuthorsString(Collection<Author> authors) {

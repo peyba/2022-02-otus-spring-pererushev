@@ -14,10 +14,7 @@ import ru.otus.homework06.domain.Book;
 import ru.otus.homework06.domain.BookComment;
 import ru.otus.homework06.domain.Genre;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Import({BookRepositoryJpa.class, GenreRepositoryJpa.class, AuthorRepositoryJpa.class})
 @ExtendWith(SpringExtension.class)
 @DisplayName("Тестирование класса BookDaoJdbc")
-class BookRepositoryJpaTest {
+class BookDtoRepositoryJpaTest {
 
     private static final int FIND_ALL_EXPECTED_RESULT_COUNT = 2;
     private static final Long NEW_BOOK3_ID = 3L;
@@ -156,6 +153,7 @@ class BookRepositoryJpaTest {
     }
 
     @Test
+    @DisplayName("Проверка поиска элемента по ID")
     void findById() {
         var expectedBook = Optional.of(
                 new Book()
@@ -326,16 +324,16 @@ class BookRepositoryJpaTest {
 
     private Set<BookComment> getCommentsForBook(Long bookId) {
         if (bookId.equals(FIRST_BOOK_ID)) {
-            return Set.of(
-                    new BookComment().setId(FIRST_BOOK_COMMENT1_ID).setBook(em.find(Book.class, FIRST_BOOK_ID)).setText(FIRST_BOOK_COMMENT1),
-                    new BookComment().setId(FIRST_BOOK_COMMENT2_ID).setBook(em.find(Book.class, FIRST_BOOK_ID)).setText(FIRST_BOOK_COMMENT2)
-            );
+            Set<BookComment> comments = new HashSet<>();
+            comments.add(new BookComment().setId(FIRST_BOOK_COMMENT1_ID).setBook(em.find(Book.class, FIRST_BOOK_ID)).setText(FIRST_BOOK_COMMENT1));
+            comments.add(new BookComment().setId(FIRST_BOOK_COMMENT2_ID).setBook(em.find(Book.class, FIRST_BOOK_ID)).setText(FIRST_BOOK_COMMENT2));
+            return comments;
         } else if (bookId.equals(SECOND_BOOK_ID)) {
-            return Set.of(
-                    new BookComment().setId(SECOND_BOOK_COMMENT1_ID).setBook(em.find(Book.class, SECOND_BOOK_ID)).setText(SECOND_BOOK_COMMENT1),
-                    new BookComment().setId(SECOND_BOOK_COMMENT2_ID).setBook(em.find(Book.class, SECOND_BOOK_ID)).setText(SECOND_BOOK_COMMENT2),
-                    new BookComment().setId(SECOND_BOOK_COMMENT3_ID).setBook(em.find(Book.class, SECOND_BOOK_ID)).setText(SECOND_BOOK_COMMENT3)
-            );
+            Set<BookComment> comments = new HashSet<>();
+            comments.add(new BookComment().setId(SECOND_BOOK_COMMENT1_ID).setBook(em.find(Book.class, SECOND_BOOK_ID)).setText(SECOND_BOOK_COMMENT1));
+            comments.add(new BookComment().setId(SECOND_BOOK_COMMENT2_ID).setBook(em.find(Book.class, SECOND_BOOK_ID)).setText(SECOND_BOOK_COMMENT2));
+            comments.add(new BookComment().setId(SECOND_BOOK_COMMENT3_ID).setBook(em.find(Book.class, SECOND_BOOK_ID)).setText(SECOND_BOOK_COMMENT3));
+            return comments;
         } else if (bookId.equals(NEW_BOOK3_ID)) {
             return Set.of(
                     new BookComment().setId(START_BOOK_COMMENT_SEQUENCE).setBook(new Book().setId(NEW_BOOK3_ID)).setText(FIRST_BOOK_COMMENT1)

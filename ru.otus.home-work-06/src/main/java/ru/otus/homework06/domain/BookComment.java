@@ -25,24 +25,15 @@ public class BookComment {
     private String text;
 
     @Override
-    public String toString() {
-        return "BookComment{" +
-                "id=" + id +
-                ", book_id=" + book.getId() +
-                ", text='" + text + '\'' +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         BookComment that = (BookComment) o;
-        return Objects.equals(id, that.id) && Objects.equals(book.getId(), that.book.getId()) && Objects.equals(text, that.text);
+        return Objects.equals(id, that.id) && Objects.equals(text, that.text);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, book.getId(), text);
+        return Objects.hash(id, text);
     }
 }

@@ -10,10 +10,10 @@ import org.springframework.shell.jline.ScriptShellApplicationRunner;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.homework06.domain.Author;
-import ru.otus.homework06.domain.Book;
-import ru.otus.homework06.domain.BookComment;
-import ru.otus.homework06.domain.Genre;
+import ru.otus.homework06.dto.AuthorDto;
+import ru.otus.homework06.dto.BookCommentDto;
+import ru.otus.homework06.dto.BookDto;
+import ru.otus.homework06.dto.GenreDto;
 
 import java.util.Optional;
 import java.util.Set;
@@ -68,14 +68,14 @@ class LibraryServiceImplTest {
     @Transactional
     @Rollback
     void saveBook() {
-        var newBook = new Book()
+        var newBook = new BookDto()
                 .setName(NEW_BOOK3_NAME)
                 .setGenre(getGenreForTest())
                 .setAuthors(getAuthorsListForTest());
 
         assertNotNull(libraryBookService.save(newBook).getId());
 
-        //libraryBookService.deleteById(libraryBookService.save(newBook).getId());
+        libraryBookService.deleteById(libraryBookService.save(newBook).getId());
     }
 
     @Test
@@ -83,7 +83,6 @@ class LibraryServiceImplTest {
     @DisplayName("Проверяем получение всех книг")
     void getAllBooks() {
         assertEquals(FIND_ALL_EXPECTED_RESULT_COUNT, libraryBookService.getAll().size());
-        assertEquals(2, libraryBookService.getAll().get(0).getBookComments().size());
     }
 
     @Test
@@ -91,7 +90,7 @@ class LibraryServiceImplTest {
     @DisplayName("Проверяем поиск книги по ID")
     void findById() {
         var expectedBook = Optional.ofNullable(
-                new Book()
+                new BookDto()
                         .setId(FIRST_BOOK_ID)
                         .setName(FIRST_BOOK_NAME)
                         .setGenre(getGenreForTest())
@@ -138,7 +137,7 @@ class LibraryServiceImplTest {
     @DisplayName("Проверяем поиск автора по ID")
     void findAuthorById() {
         var expectedAuthor = Optional.ofNullable(
-                new Author()
+                new AuthorDto()
                         .setId(FIRST_AUTHOR_ID)
                         .setFirstName(FIRST_AUTHOR_NAME)
                         .setSecondName(FIRST_AUTHOR_NAME)
@@ -147,32 +146,30 @@ class LibraryServiceImplTest {
         assertEquals(expectedAuthor, libraryAuthorService.findById(FIRST_AUTHOR_ID));
     }
 
-    private Set<Author> getAuthorsListForTest() {
+    private Set<AuthorDto> getAuthorsListForTest() {
         return Set.of(
-                new Author().setId(FIRST_AUTHOR_ID).setFirstName(FIRST_AUTHOR_NAME).setSecondName(FIRST_AUTHOR_NAME),
-                new Author().setId(SECOND_AUTHOR_ID).setFirstName(SECOND_AUTHOR_NAME).setSecondName(SECOND_AUTHOR_NAME)
+                new AuthorDto().setId(FIRST_AUTHOR_ID).setFirstName(FIRST_AUTHOR_NAME).setSecondName(FIRST_AUTHOR_NAME),
+                new AuthorDto().setId(SECOND_AUTHOR_ID).setFirstName(SECOND_AUTHOR_NAME).setSecondName(SECOND_AUTHOR_NAME)
         );
     }
 
-    private Genre getGenreForTest() {
-        return new Genre()
+    private GenreDto getGenreForTest() {
+        return new GenreDto()
                 .setId(GENRE_ID)
                 .setCode(GENRE_CODE);
     }
 
-    private Set<BookComment> getCommentsForBook(Long bookId) {
+    private Set<BookCommentDto> getCommentsForBook(Long bookId) {
         if (bookId.equals(FIRST_BOOK_ID)) {
-            var book = libraryBookService.findById(FIRST_BOOK_ID).orElseThrow();
             return Set.of(
-                    new BookComment().setId(FIRST_BOOK_COMMENT1_ID).setBook(book).setText(FIRST_BOOK_COMMENT1),
-                    new BookComment().setId(FIRST_BOOK_COMMENT2_ID).setBook(book).setText(FIRST_BOOK_COMMENT2)
+                    new BookCommentDto().setId(FIRST_BOOK_COMMENT1_ID).setText(FIRST_BOOK_COMMENT1),
+                    new BookCommentDto().setId(FIRST_BOOK_COMMENT2_ID).setText(FIRST_BOOK_COMMENT2)
             );
         } else if (bookId.equals(SECOND_BOOK_ID)) {
-            var book = libraryBookService.findById(SECOND_BOOK_ID).orElseThrow();
             return Set.of(
-                    new BookComment().setId(SECOND_BOOK_COMMENT1_ID).setBook(book).setText(SECOND_BOOK_COMMENT1),
-                    new BookComment().setId(SECOND_BOOK_COMMENT2_ID).setBook(book).setText(SECOND_BOOK_COMMENT2),
-                    new BookComment().setId(SECOND_BOOK_COMMENT3_ID).setBook(book).setText(SECOND_BOOK_COMMENT3)
+                    new BookCommentDto().setId(SECOND_BOOK_COMMENT1_ID).setText(SECOND_BOOK_COMMENT1),
+                    new BookCommentDto().setId(SECOND_BOOK_COMMENT2_ID).setText(SECOND_BOOK_COMMENT2),
+                    new BookCommentDto().setId(SECOND_BOOK_COMMENT3_ID).setText(SECOND_BOOK_COMMENT3)
             );
         } else {
             return Set.of();

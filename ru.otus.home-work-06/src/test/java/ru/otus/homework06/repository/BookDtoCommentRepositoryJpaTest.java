@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Import(BookCommentRepositoryJpa.class)
 @ExtendWith(SpringExtension.class)
 @DisplayName("Тестирование класса BookCommentRepositoryJpa")
-class BookCommentRepositoryJpaTest {
+class BookDtoCommentRepositoryJpaTest {
 
     private static final Long FIRST_BOOK_ID = 1L;
     private static final Long SECOND_BOOK_ID = 2L;
