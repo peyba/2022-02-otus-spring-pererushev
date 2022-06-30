@@ -1,0 +1,62 @@
+package ru.otus.homework08.decorators;
+
+import org.springframework.stereotype.Component;
+import ru.otus.homework08.dto.AuthorDto;
+import ru.otus.homework08.dto.BookTitleDto;
+import ru.otus.homework08.dto.GenreDto;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@Component
+public class BookTitleDtoListDecorator extends AbstractEntityListDecorator<BookTitleDto> {
+    @Override
+    protected Map<String, Integer> columns() {
+        Map<String, Integer> columns = new LinkedHashMap<>();
+        columns.put("id", 4);
+        columns.put("name", 25);
+        columns.put("genre", 25);
+        columns.put("author", 50);
+        return columns;
+    }
+
+    @Override
+    protected Map<String, Object> mapEntity(BookTitleDto book) {
+        Map<String, Object> booksPrintMap = new HashMap<>();
+        booksPrintMap.put("id", book.getId());
+        booksPrintMap.put("name", book.getName());
+        booksPrintMap.put("genre", getGenreString(book.getGenre()));
+        booksPrintMap.put("author", getAuthorsString(book.getAuthors()));
+        return booksPrintMap;
+    }
+
+    @Override
+    protected String getTitle() {
+        return "Books";
+    }
+
+    @Override
+    protected boolean hasTitle() {
+        return true;
+    }
+
+    private String getAuthorsString(Collection<AuthorDto> authors) {
+        var sb = new StringBuilder();
+        for (var author : authors) {
+            sb
+                    .append(author.getId())
+                    .append(" - ")
+                    .append(author.getSecondName())
+                    .append(" ")
+                    .append(author.getFirstName())
+                    .append("; ");
+        }
+        return sb.toString();
+    }
+
+    private String getGenreString(GenreDto genre) {
+        return genre.getId() + " - " + genre.getNameRus();
+    }
+}
