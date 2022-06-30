@@ -1,9 +1,9 @@
 package ru.otus.homework07.decorators;
 
 import org.springframework.stereotype.Component;
-import ru.otus.homework07.domain.Author;
-import ru.otus.homework07.domain.Genre;
+import ru.otus.homework07.dto.AuthorDto;
 import ru.otus.homework07.dto.BookTitleDto;
+import ru.otus.homework07.dto.GenreDto;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -42,7 +42,7 @@ public class BookTitleDtoListDecorator extends AbstractEntityListDecorator<BookT
         return true;
     }
 
-    private String getAuthorsString(Collection<Author> authors) {
+    private String getAuthorsString(Collection<AuthorDto> authors) {
         var sb = new StringBuilder();
         for (var author : authors) {
             sb
@@ -56,7 +56,7 @@ public class BookTitleDtoListDecorator extends AbstractEntityListDecorator<BookT
         return sb.toString();
     }
 
-    private String getGenreString(Genre genre) {
+    private String getGenreString(GenreDto genre) {
         return genre.getId() + " - " + genre.getNameRus();
     }
 }

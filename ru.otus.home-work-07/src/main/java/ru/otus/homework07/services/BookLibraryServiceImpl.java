@@ -16,14 +16,13 @@ import java.util.*;
 
 @Component
 @RequiredArgsConstructor
-public class BookLibraryServiceImpl implements LibraryBookService {
+public class BookLibraryServiceImpl implements BookLibraryService {
 
     private final BookRepository bookRepository;
     private final BookCommentRepository commentRepository;
     private final ModelMapper modelMapper;
 
     @Override
-    @Transactional
     public BookDto save(BookDto bookDto) {
         if(bookDto.getAuthors() == null) {
             bookDto.setAuthors(Set.of());
@@ -58,7 +57,6 @@ public class BookLibraryServiceImpl implements LibraryBookService {
     }
 
     @Override
-    @Transactional
     public void deleteById(Long id) {
         bookRepository.deleteById(id);
     }

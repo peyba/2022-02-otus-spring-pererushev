@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class LibraryAuthorServiceImpl implements LibraryAuthorService {
+public class AuthorLibraryServiceImpl implements AuthorLibraryService {
 
     private final AuthorRepository authorRepository;
     private final ModelMapper modelMapper;

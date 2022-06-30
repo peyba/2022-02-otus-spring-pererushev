@@ -2,8 +2,6 @@ package ru.otus.homework07.dto;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import ru.otus.homework07.domain.Author;
-import ru.otus.homework07.domain.Genre;
 
 import java.util.Set;
 
@@ -12,6 +10,6 @@ import java.util.Set;
 public class BookTitleDto {
     private Long id;
     private String name;
-    private Genre genre;
-    private Set<Author> authors;
+    private GenreDto genre;
+    private Set<AuthorDto> authors;
 }

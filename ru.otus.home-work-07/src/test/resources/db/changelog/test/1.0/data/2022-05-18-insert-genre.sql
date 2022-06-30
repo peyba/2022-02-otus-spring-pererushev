@@ -1,5 +1,5 @@
 --liquibase formatted sql
---changeset a.pererushev:hw-06
+--changeset a.pererushev:hw-07
 
 INSERT INTO public.genre (id, code, name_eng, name_rus)
 VALUES

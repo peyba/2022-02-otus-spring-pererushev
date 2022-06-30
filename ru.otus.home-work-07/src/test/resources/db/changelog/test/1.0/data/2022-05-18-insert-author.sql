@@ -1,5 +1,5 @@
 --liquibase formatted sql
---changeset a.pererushev:hw-06
+--changeset a.pererushev:hw-07
 
 INSERT INTO public.author (id, first_name, second_name)
 VALUES

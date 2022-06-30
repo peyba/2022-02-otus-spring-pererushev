@@ -7,9 +7,9 @@ import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellMethodAvailability;
 import ru.otus.homework07.decorators.EntityListDecorator;
 import ru.otus.homework07.dto.*;
-import ru.otus.homework07.services.LibraryAuthorService;
-import ru.otus.homework07.services.LibraryBookService;
-import ru.otus.homework07.services.LibraryGenreService;
+import ru.otus.homework07.services.AuthorLibraryService;
+import ru.otus.homework07.services.BookLibraryService;
+import ru.otus.homework07.services.GenreLibraryService;
 
 import java.util.HashSet;
 
@@ -23,9 +23,9 @@ public class ApplicationCommands {
     private static final String DELETED_STATUS = "Deleted!";
 
     private final ShellContext shellContext;
-    private final LibraryBookService libraryBookService;
-    private final LibraryAuthorService libraryAuthorService;
-    private final LibraryGenreService libraryGenreService;
+    private final BookLibraryService bookLibraryService;
+    private final AuthorLibraryService authorLibraryService;
+    private final GenreLibraryService genreLibraryService;
     private final EntityListDecorator<BookTitleDto> bookTitleDtoEntityListDecorator;
     private final EntityListDecorator<GenreDto> genreListDecorator;
     private final EntityListDecorator<AuthorDto> authorListDecorator;
@@ -36,7 +36,7 @@ public class ApplicationCommands {
     @ShellMethodAvailability("isBookEditMode")
     public String saveBook() {
         var bookObject = shellContext.getObject(BOOK_CONTEXT_OBJECT_KEY, BookDto.class);
-        var book = libraryBookService.save(bookObject);
+        var book = bookLibraryService.save(bookObject);
         shellContext.drop();
         return book.toString() +
                 System.lineSeparator() +
@@ -47,7 +47,7 @@ public class ApplicationCommands {
     @ShellMethodAvailability("isBookEditMode")
     public String bookSetGenre(Long id) {
         var bookObject = shellContext.getObject(BOOK_CONTEXT_OBJECT_KEY, BookDto.class);
-        var genre = libraryGenreService.findById(id);
+        var genre = genreLibraryService.findById(id);
         if (genre.isEmpty()) {
             return "Genre with id: " + id + " does not exists";
         }
@@ -66,7 +66,7 @@ public class ApplicationCommands {
     @ShellMethod(value = "Add author to the book", key = {"book-author-add"}, group = ".. Book creating/editing mode")
     @ShellMethodAvailability("isBookEditMode")
     public String bookAddAuthor(Long id) {
-        var author = libraryAuthorService.findById(id);
+        var author = authorLibraryService.findById(id);
         if (author.isEmpty()) {
             return "Author with id = " + id + " does not exists";
         }
@@ -111,7 +111,7 @@ public class ApplicationCommands {
     @ShellMethod(value = "Book edit mode on", key = {"book-edit"}, group = ". Common commands")
     @ShellMethodAvailability("isRoot")
     public void editBookMode(Long id) {
-        var book = libraryBookService.findById(id);
+        var book = bookLibraryService.findById(id);
         shellContext.addObject(BOOK_CONTEXT_OBJECT_KEY, book.orElseThrow(() -> new RuntimeException("Book dont exists")));
         shellContext.setContext(ShellContext.WorkingContext.EDIT_BOOK);
     }
@@ -123,52 +123,52 @@ public class ApplicationCommands {
 
     @ShellMethod(value = "Print all books", key = {"books"}, group = ". Common commands")
     public String getAllBooks() {
-        return bookTitleDtoEntityListDecorator.decorate(libraryBookService.getAll());
+        return bookTitleDtoEntityListDecorator.decorate(bookLibraryService.getAll());
     }
 
     @ShellMethod(value = "Search book by id", key = {"book-by-id", "book"}, group = ". Common commands")
     public String findBookById(Long id) {
-        var book = libraryBookService.findById(id);
+        var book = bookLibraryService.findById(id);
         return book.isEmpty() ? "null" : book.get().toString();
     }
 
     @ShellMethod(value = "Delete book by id", key = {"book-delete-id", "book-delete"}, group = ". Common commands")
     public String deleteBookById(Long id) {
-        libraryBookService.deleteById(id);
+        bookLibraryService.deleteById(id);
         return DELETED_STATUS;
     }
 
     @ShellMethod(value = "Print all genres", key = {"genres"}, group = ". Common commands")
     public String getAllGenres() {
-        return genreListDecorator.decorate(libraryGenreService.getAll());
+        return genreListDecorator.decorate(genreLibraryService.getAll());
     }
 
     @ShellMethod(value = "Search genre by id", key = {"genre-by-id", "genre"}, group = ". Common commands")
     public String findGenreById(Long id) {
-        var genre = libraryGenreService.findById(id);
+        var genre = genreLibraryService.findById(id);
         return genre.isEmpty() ? "null" : genre.get().toString();
     }
 
     @ShellMethod(value = "Print all authors", key = {"authors"}, group = ". Common commands")
     public String getAllAuthors() {
-        return authorListDecorator.decorate(libraryAuthorService.getAll());
+        return authorListDecorator.decorate(authorLibraryService.getAll());
     }
 
     @ShellMethod(value = "Search genre by id", key = {"author-by-id", "author"}, group = ". Common commands")
     public String findAuthorById(Long id) {
-        var author = libraryAuthorService.findById(id);
+        var author = authorLibraryService.findById(id);
         return author.isEmpty() ? "null" : author.get().toString();
     }
 
     @ShellMethod(value = "Show all book's comments", key = {"book-comments", "comments"}, group = ". Common commands")
     public String findAllBookComments(Long id) {
-        var bookComments = libraryBookService.getAllComments(id);
+        var bookComments = bookLibraryService.getAllComments(id);
         return commentListDecorator.decorate(bookComments);
     }
 
     @ShellMethod(value = "Delete comment", key = {"book-comment-delete", "comment-delete"}, group = ". Common commands")
     public String deleteBookComment(Long id) {
-        libraryBookService.deleteCommentById(id);
+        bookLibraryService.deleteCommentById(id);
         return "Ok";
     }
     // endregion

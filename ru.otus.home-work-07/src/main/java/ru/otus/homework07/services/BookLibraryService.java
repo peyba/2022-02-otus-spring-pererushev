@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public interface LibraryBookService {
+public interface BookLibraryService {
     BookDto save(BookDto book);
     List<BookTitleDto> getAll();
     Optional<BookDto> findById(Long id);
