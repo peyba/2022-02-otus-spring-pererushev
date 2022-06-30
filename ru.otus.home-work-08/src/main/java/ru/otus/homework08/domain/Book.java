@@ -3,46 +3,30 @@ package ru.otus.homework08.domain;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.*;
+import java.math.BigInteger;
 import java.util.Objects;
 import java.util.Set;
 
 @Accessors(chain = true)
-@Entity
-@Table(name = "book", schema = "public")
+@Document("books")
 @Getter
 @Setter
 public class Book {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "book_sequence_id")
-    @SequenceGenerator(name = "book_sequence_id", allocationSize = 1, sequenceName = "public.book_sequence_id")
-    @Column(name = "Id")
-    private Long id;
+    private BigInteger id;
 
-    @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToOne(targetEntity = Genre.class)
-    @JoinColumn(name = "genre_id", referencedColumnName = "id")
     private Genre genre;
 
-    @ManyToMany(targetEntity = Author.class, fetch=FetchType.EAGER)
-    @JoinTable(
-            name = "book_authors",
-            joinColumns = @JoinColumn(name = "book_id"),
-            inverseJoinColumns = @JoinColumn(name = "author_id")
-    )
-    @Fetch(value = FetchMode.SUBSELECT)
-    @Column(nullable = false)
     private Set<Author> authors;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Fetch(value = FetchMode.SUBSELECT)
-    @Column(nullable = false)
+    @DBRef(db = "book_comments")
     private Set<BookComment> bookComments;
 
     @Override

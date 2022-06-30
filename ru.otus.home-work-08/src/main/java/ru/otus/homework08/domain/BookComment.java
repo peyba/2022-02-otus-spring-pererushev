@@ -3,25 +3,23 @@ package ru.otus.homework08.domain;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.*;
 import java.util.Objects;
 
 @Accessors(chain = true)
-@Entity
-@Table(name = "book_comment", schema = "public")
+@Document("book_comments")
 @Getter
 @Setter
 public class BookComment {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "book_comment_sequence_id")
-    @SequenceGenerator(name = "book_comment_sequence_id", sequenceName = "public.book_comment_sequence_id", allocationSize = 1)
     private Long id;
 
-    @ManyToOne
+    @DBRef(db = "books")
     private Book book;
 
-    @Column(name = "text")
     private String text;
 
     @Override

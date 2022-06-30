@@ -12,6 +12,7 @@ import ru.otus.homework08.repository.BookCommentRepository;
 import ru.otus.homework08.repository.BookRepository;
 import ru.otus.homework08.domain.Book;
 
+import java.math.BigInteger;
 import java.util.*;
 
 @Component
@@ -49,7 +50,7 @@ public class BookLibraryServiceImpl implements BookLibraryService {
     @Override
     @Transactional(readOnly = true)
     public Optional<BookDto> findById(Long id) {
-        var book = bookRepository.findById(id);
+        var book = bookRepository.findById(BigInteger.valueOf(id));
         if (book.isEmpty()) {
             return Optional.empty();
         }
@@ -58,13 +59,13 @@ public class BookLibraryServiceImpl implements BookLibraryService {
 
     @Override
     public void deleteById(Long id) {
-        bookRepository.deleteById(id);
+        bookRepository.deleteById(BigInteger.valueOf(id));
     }
 
     @Override
     @Transactional(readOnly = true)
     public Set<BookCommentDto> getAllComments(Long bookId) {
-        var book = bookRepository.findById(bookId);
+        var book = bookRepository.findById(BigInteger.valueOf(bookId));
         if (book.isEmpty()) {
             return Set.of();
         } else {
