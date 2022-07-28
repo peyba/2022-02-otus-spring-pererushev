@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,10 +15,14 @@ import java.util.Objects;
 @Getter
 @Setter
 public class BookComment {
+
+    @Transient
+    public static final String SEQUENCE_NAME = "book_comment_sequence";
+
     @Id
     private Long id;
 
-    @DBRef(db = "books")
+    @DBRef
     private Book book;
 
     private String text;

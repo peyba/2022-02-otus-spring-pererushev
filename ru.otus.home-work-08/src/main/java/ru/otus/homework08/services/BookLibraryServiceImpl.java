@@ -12,7 +12,6 @@ import ru.otus.homework08.repository.BookCommentRepository;
 import ru.otus.homework08.repository.BookRepository;
 import ru.otus.homework08.domain.Book;
 
-import java.math.BigInteger;
 import java.util.*;
 
 @Component
@@ -35,9 +34,21 @@ public class BookLibraryServiceImpl implements BookLibraryService {
 
         var book = convertToBookEntity(bookDto);
 
+        if (book.getId() == null) {
+            book.setId(bookRepository.save(new Book()).getId());
+        }
+
+        saveComments(bookDto);
+
         var savedBook = bookRepository.save(book);
 
         return convertToBookDto(savedBook);
+    }
+
+    private void saveComments(BookDto book) {
+        for (var comment : book.getBookComments()) {
+            comment.setId(commentRepository.save(convertToBookComment(comment)).getId());
+        }
     }
 
     @Override
@@ -48,9 +59,8 @@ public class BookLibraryServiceImpl implements BookLibraryService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<BookDto> findById(Long id) {
-        var book = bookRepository.findById(BigInteger.valueOf(id));
+        var book = bookRepository.findById(id);
         if (book.isEmpty()) {
             return Optional.empty();
         }
@@ -59,19 +69,14 @@ public class BookLibraryServiceImpl implements BookLibraryService {
 
     @Override
     public void deleteById(Long id) {
-        bookRepository.deleteById(BigInteger.valueOf(id));
+        commentRepository.deleteByBook_Id(id);
+        bookRepository.deleteById(id);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Set<BookCommentDto> getAllComments(Long bookId) {
-        var book = bookRepository.findById(BigInteger.valueOf(bookId));
-        if (book.isEmpty()) {
-            return Set.of();
-        } else {
-            var bookDto = convertToBookDto(book.get());
-            return bookDto.getBookComments();
-        }
+        var comments = commentRepository.findByBook_Id(bookId);
+        return convertToBookCommentDtoSet(comments);
     }
 
     @Override
@@ -88,16 +93,17 @@ public class BookLibraryServiceImpl implements BookLibraryService {
     public void deleteCommentById(Long id) {
         var comment = commentRepository.findById(id);
         if (comment.isPresent()) {
-            var comm = comment.get();
-            comm.getBook().getBookComments().remove(comm);
-            commentRepository.delete(comm);
+            commentRepository.delete(comment.get());
         } else {
             throw new LibraryEntitySavingException("Can't find comment. id: " + id);
         }
     }
 
     private BookDto convertToBookDto(Book book) {
-        return modelMapper.map(book, BookDto.class);
+        var comments = commentRepository.findByBook_Id(book.getId());
+        return modelMapper.map(book, BookDto.class)
+                .setBookComments(convertToBookCommentDtoSet(comments));
+
     }
 
     private BookTitleDto convertToBookTitleDto(Book book) {
@@ -105,15 +111,19 @@ public class BookLibraryServiceImpl implements BookLibraryService {
     }
 
     private Book convertToBookEntity(BookDto bookDto) {
-        var book = modelMapper.map(bookDto, Book.class);
-        for (BookComment bookComment : book.getBookComments()) {
-            bookComment.setBook(book);
-        }
-        return book;
+        return modelMapper.map(bookDto, Book.class);
     }
 
     private BookCommentDto convertToBookCommentDto(BookComment bookComment) {
         return modelMapper.map(bookComment, BookCommentDto.class);
+    }
+
+    private Set<BookCommentDto> convertToBookCommentDtoSet(Iterable<BookComment> bookComments) {
+        var bookCommentList = new HashSet<BookCommentDto>();
+        for (var bookComment : bookComments) {
+            bookCommentList.add(modelMapper.map(bookComment, BookCommentDto.class));
+        }
+        return bookCommentList;
     }
 
     private BookComment convertToBookComment(BookCommentDto bookCommentDto) {

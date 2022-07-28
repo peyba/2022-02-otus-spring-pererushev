@@ -2,9 +2,7 @@ package ru.otus.homework08.mongock.changelog;
 
 import com.github.cloudyrock.mongock.ChangeLog;
 import com.github.cloudyrock.mongock.ChangeSet;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import org.bson.Document;
 import ru.otus.homework08.domain.Author;
 import ru.otus.homework08.domain.Book;
 import ru.otus.homework08.domain.BookComment;
@@ -13,7 +11,6 @@ import ru.otus.homework08.repository.AuthorRepository;
 import ru.otus.homework08.repository.BookCommentRepository;
 import ru.otus.homework08.repository.BookRepository;
 import ru.otus.homework08.repository.GenreRepository;
-import ru.otus.homework08.services.BookLibraryService;
 
 import java.util.List;
 import java.util.Set;
@@ -23,10 +20,14 @@ public class DatabaseChangelog {
 
     @ChangeSet(order = "001", id = "dropDb", author = "a.pererushev", runAlways = true/*TODO: убрать при переходе на реальную БД*/)
     public void dropDb(MongoDatabase db) {
-        //db.drop();
+        db.getCollection("books").drop();
+        db.getCollection("book_comments").drop();
+        db.getCollection("database_sequences").drop();
+        db.getCollection("authors").drop();
+        db.getCollection("genres").drop();
     }
 
-    @ChangeSet(order = "002", id = "addAuthors", author = "a.pererushev")
+    @ChangeSet(order = "002", id = "addAuthors", author = "a.pererushev", runAlways = true/*TODO: убрать при переходе на реальную БД*/)
     public void addAuthors(AuthorRepository repository) {
         List<Author> authorList = List.of(
                 new Author().setId(0L).setFirstName("UNKNOWN").setSecondName("UNKNOWN"),
@@ -37,7 +38,7 @@ public class DatabaseChangelog {
         repository.saveAll(authorList);
     }
 
-    @ChangeSet(order = "003", id = "addGenres", author = "a.pererushev")
+    @ChangeSet(order = "003", id = "addGenres", author = "a.pererushev", runAlways = true/*TODO: убрать при переходе на реальную БД*/)
     public void addGenres(GenreRepository repository) {
         var genres = List.of(
             new Genre().setId(1L).setCode("CRIME").setNameEng("Crime").setNameRus("Криминальная проза, детектив"),
@@ -81,10 +82,15 @@ public class DatabaseChangelog {
         repository.saveAll(genres);
     }
 
-    @ChangeSet(order = "004", id = "addBooks", author = "a.pererusehv")
-    public void addBooks(BookRepository bookRepository, GenreRepository genreRepository, AuthorRepository authorRepository) {
+    @ChangeSet(order = "004", id = "addBooks", author = "a.pererusehv", runAlways = true/*TODO: убрать при переходе на реальную БД*/)
+    public void addBooks(
+            BookRepository bookRepository,
+            GenreRepository genreRepository,
+            AuthorRepository authorRepository
+    ) {
         var boos = List.of(
-                new Book().setName("Обитаемый остров")
+                new Book()
+                        .setName("Обитаемый остров")
                         .setGenre(genreRepository.findById(5L).orElseThrow())
                         .setAuthors(
                                 Set.of(
@@ -92,30 +98,27 @@ public class DatabaseChangelog {
                                         authorRepository.findById(2L).orElseThrow()
                                 )
                         ),
-                new Book().setName("Новейшая история России")
+                new Book()
+                        .setName("Новейшая история России")
                         .setGenre(genreRepository.findById(4L).orElseThrow())
-                        .setBookComments(
-                                Set.of(new BookComment().setText("qqqq"))
-                        )
+                        .setAuthors(Set.of())
         );
 
         bookRepository.saveAll(boos);
     }
 
-    @ChangeSet(order = "005", id = "addBookComments", author = "a.pererusehv")
+    @ChangeSet(order = "005", id = "addBookComments", author = "a.pererusehv", runAlways = true/*TODO: убрать при переходе на реальную БД*/)
     public void addBookComments(BookRepository bookRepository, BookCommentRepository bookCommentRepository) {
+        var book1 = bookRepository.findById(1L);
+        var book2 = bookRepository.findById(2L);
+        List<BookComment> comments = List.of(
+                new BookComment().setBook(book1.orElseThrow()).setText("Good, but short"),
+                new BookComment().setBook(book1.orElseThrow()).setText("Out of stock"),
+                new BookComment().setBook(book2.orElseThrow()).setText("Out of stock"),
+                new BookComment().setBook(book2.orElseThrow()).setText("Very boooooriiiiing!!!"),
+                new BookComment().setBook(book2.orElseThrow()).setText("Got it.")
+        );
 
+        bookCommentRepository.saveAll(comments);
     }
-
-    //@ChangeSet(order = "002", id = "insertLermontov", author = "ydvorzhetskiy")
-    //public void insertLermontov(MongoDatabase db) {
-    //    MongoCollection<Document> myCollection = db.getCollection("persons");
-    //    var doc = new Document().append("name", "Lermontov");
-    //    myCollection.insertOne(doc);
-    //}
-
-    //@ChangeSet(order = "003", id = "insertPushkin", author = "stvort")
-    //public void insertPushkin(PersonRepository repository) {
-    //    repository.save(new Person("Pushkin"));
-    //}
 }

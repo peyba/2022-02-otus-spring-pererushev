@@ -12,8 +12,6 @@ public class BookCommentDtoListDecorator extends AbstractEntityListDecorator<Boo
     @Override
     protected Map<String, Integer> columns() {
         Map<String, Integer> columns = new LinkedHashMap<>();
-        columns.put("book_id", 4);
-        columns.put("book_name", 20);
         columns.put("id", 4);
         columns.put("text", 30);
         return columns;

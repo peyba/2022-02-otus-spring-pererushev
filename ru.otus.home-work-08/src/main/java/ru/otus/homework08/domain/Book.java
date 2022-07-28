@@ -4,10 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.math.BigInteger;
 import java.util.Objects;
 import java.util.Set;
 
@@ -17,17 +16,17 @@ import java.util.Set;
 @Setter
 public class Book {
 
+    @Transient
+    public static final String SEQUENCE_NAME = "book_sequence";
+
     @Id
-    private BigInteger id;
+    private Long id;
 
     private String name;
 
     private Genre genre;
 
     private Set<Author> authors;
-
-    @DBRef(db = "book_comments")
-    private Set<BookComment> bookComments;
 
     @Override
     public String toString() {
@@ -44,11 +43,11 @@ public class Book {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Book book = (Book) o;
-        return Objects.equals(id, book.id) && Objects.equals(name, book.name) && Objects.equals(genre, book.genre) && Objects.equals(authors, book.authors) && Objects.equals(bookComments, book.bookComments);
+        return Objects.equals(id, book.id) && Objects.equals(name, book.name) && Objects.equals(genre, book.genre) && Objects.equals(authors, book.authors);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, genre, authors, bookComments);
+        return Objects.hash(id, name, genre, authors);
     }
 }
