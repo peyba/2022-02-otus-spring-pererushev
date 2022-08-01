@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Edit book</title>
+    <link rel="stylesheet" href="../static/css/navigation.css" th:href="@{/css/navigation.css}" type="text/css">
+    <link rel="stylesheet" href="../static/css/table.css" th:href="@{/css/table.css}" type="text/css">
+    <link rel="shortcut icon" type="image/png" href="../static/book-icon.png" th:href="@{/book-icon.png}"/>
+</head>
+<body>
+<script type="text/javascript" src="../static/js/authors_list.js" th:src="@{/js/authors_list.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    class Author {
+        constructor(id, fn, sn) {
+            this.id = id;
+            this.fn = fn;
+            this.sn = sn;
+        }
+    }
+
+    var authors = [];
+    /*[# th:each="author : ${authors}"]*/
+    authors.push(new Author("[(${author.getId()})]", "[(${author.getFirstName()})]", "[(${author.getSecondName()})]"));
+    /*[/]*/
+    /*]]>*/
+</script>
+
+<form id="edit-form" action="book_edit.html" th:action="@{/book/edit(id=${book.getId()})}" th:method="post" th:object="${book}">
+
+    <nav>
+        <ul class="menu">
+            <li><img class="icon" src="../static/book-icon.png" th:src="@{/book-icon.png}"></li>
+            <li class="menu-text">Book editor</li>
+            <li class="menu-control-buttons"><a href="books.html" th:href="@{/book/view(id=${book.getId()})}"><button class="menu-control-cancel" type="button">Cancel</button></a></li>
+            <li class="menu-control-buttons"><button class="menu-control-save" type="submit">Save</button></li>
+        </ul>
+    </nav>
+
+    <div class="fields">
+        <table class="list">
+            <caption>Fields</caption>
+            <thead>
+            <tr>
+                <td>Field name</td>
+                <td>Field value</td>
+            </tr>
+            </thead>
+            <tbody>
+                <tr class="odd">
+                    <td>ID</td>
+                    <td><input id="id-input" name="id" type="text" readonly="readonly" th:value="*{id}" value="1"/></td>
+                </tr>
+                <tr class="even">
+                    <td>Name</td>
+                    <td><input id="book-name-input" name="name" type="text" th:value="*{name}" value="book 1"/></td>
+                </tr>
+                <tr class="odd">
+                    <td>Genre</td>
+                    <td>
+                        <select id="book-genre-select" name="genre">
+                            <option value="genre 1"
+                                    th:each="genre : ${genres}"
+                                    th:value="${genre.getId()}"
+                                    th:text="${genre.getCode()}"
+                                    th:selected="${book.getGenre().equals(genre)} ? 'selected'"
+                            >
+                                genre 1
+                            </option>
+                            <option value="genre 2" selected="selected" th:if="${false}">genre 2</option>
+                            <option value="genre 3" th:if="${false}">genre 3</option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="authors">
+        <table class="list" id="authors_list">
+            <caption>Authors</caption>
+            <thead>
+            <tr>
+                <th width="10px">ID</th>
+                <th width="50%">First Name</th>
+                <th width="50%">Second name</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr
+                    th:each="author, iStat : ${book.getAuthors()}"
+                    th:class="${!iStat.odd}? 'even'"
+                    class="odd"
+            >
+                <td th:text="${author.getId()}">1</td>
+                <td th:text="${author.getFirstName()}">author 1 fn</td>
+                <td th:text="${author.getSecondName()}">author 1 sn</td>
+                <td>
+                    <button type="button" th:data="${author.getId()}" onclick="rmItem(this.parentNode.parentNode, this.getAttribute('data'))">Delete</button>
+                </td>
+            </tr>
+            <tr th:if="${false}" class="even">
+                <td>2</td>
+                <td >author 2 fn</td>
+                <td >author 2 sn</td>
+                <td><button type="button" onclick="rmItem(this.parentNode.parentNode, 2)">Delete</button></td>
+            </tr>
+            <tr th:if="${false}" class="odd">
+                <td>3</td>
+                <td >author 3 fn</td>
+                <td >author 3 sn</td>
+                <td><button type="button" onclick="rmItem(this.parentNode.parentNode, 3)">Delete</button></td>
+            </tr>
+            <tr th:if="${false}" class="even">
+                <td>4</td>
+                <td >author 4 fn</td>
+                <td >author 4 sn</td>
+                <td><button type="button" onclick="rmItem(this.parentNode.parentNode, 4)">Delete</button></td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="authors-list">
+            <label for="book-author-select">Author:</label>
+            <select id="book-author-select" name="author">
+                <option value="?" selected="selected" style="font-style: italic">Select new author</option>
+                <option value="genre 1"
+                        th:each="author : ${authors}"
+                        th:value="${author.getId()}"
+                        th:text="${author.getSecondName() + ' ' + author.getFirstName()}"
+                >
+                    genre 1
+                </option>
+                <option value="genre 2" th:if="${false}">genre 2</option>
+                <option value="genre 3" th:if="${false}">genre 3</option>
+            </select>
+            <button class="add-button" type="button" onclick="addItem()">Add</button>
+        </div>
+        <select id="book-author-selected-list" name="authors" multiple hidden>
+            <option value="genre 1"
+                    th:each="author : ${book.getAuthors()}"
+                    th:value="${author.getId()}"
+                    th:text="${author.getId()}"
+                    selected="selected"
+            ></option>
+        </select>
+    </div>
+</form>
+
+</body>
+</html>

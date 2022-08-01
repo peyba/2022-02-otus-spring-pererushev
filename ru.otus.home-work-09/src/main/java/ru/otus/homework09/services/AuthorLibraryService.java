@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface AuthorLibraryService {
     List<AuthorDto> getAll();
+    List<AuthorDto> findAllById(List<Long> ids);
     Optional<AuthorDto> findById(Long id);
 }

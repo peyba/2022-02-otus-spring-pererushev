@@ -20,9 +20,12 @@ public class AuthorLibraryServiceImpl implements AuthorLibraryService {
 
     @Override
     public List<AuthorDto> getAll() {
-        List<AuthorDto> authorDtoList = new ArrayList<>();
-        authorRepository.findAll().forEach(a -> authorDtoList.add(convertToAuthorDto(a)));
-        return authorDtoList;
+        return convertAllToAuthorDto(authorRepository.findAll());
+    }
+
+    @Override
+    public List<AuthorDto> findAllById(List<Long> ids) {
+        return convertAllToAuthorDto(authorRepository.findAllById(ids));
     }
 
     @Override
@@ -36,5 +39,11 @@ public class AuthorLibraryServiceImpl implements AuthorLibraryService {
 
     private AuthorDto convertToAuthorDto(Author author) {
         return modelMapper.map(author, AuthorDto.class);
+    }
+
+    private List<AuthorDto> convertAllToAuthorDto(List<Author> authors) {
+        List<AuthorDto> authorDtoList = new ArrayList<>();
+        authors.forEach(a -> authorDtoList.add(convertToAuthorDto(a)));
+        return authorDtoList;
     }
 }

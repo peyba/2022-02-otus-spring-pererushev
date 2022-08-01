@@ -1,0 +1,32 @@
+.body {
+    padding: 50px;
+}
+
+.list thead tr{
+    background-color: cornflowerblue;
+    color: white;
+}
+
+.list {
+    border: 0;
+    position: relative;
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+    border-collapse: collapse;
+    font-family: Arial, serif;
+}
+
+.list caption{
+    font-family: Arial, serif;
+    font-size: 1em;
+}
+
+.list tr td, th {
+    padding: 5px;
+    border: 0;
+}
+
+.list .even{
+    background-color: #e2ebff;
+}
