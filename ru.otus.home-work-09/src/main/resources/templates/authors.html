@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>List of all persons</title>
+    <link rel="stylesheet" href="../static/css/navigation.css" th:href="@{/css/navigation.css}" type="text/css">
+    <link rel="stylesheet" href="../static/css/table.css" th:href="@{/css/table.css}" type="text/css">
+    <link rel="shortcut icon" type="image/png" href="../static/book-icon.png" th:href="@{/book-icon.png}"/>
+</head>
+<body>
+<nav>
+    <ul class="menu">
+        <li><img class="icon" src="../static/book-icon.png" th:src="@{/book-icon.png}"></li>
+        <li><a class="menu-button" href="books.html" th:href="@{/}">Books</a></li>
+        <li><a class="menu-button" href="authors.html" th:href="@{/authors}" >Authors</a></li>
+        <li><a class="menu-button" href="genres.html" th:href="@{/genres}">Genres</a></li>
+    </ul>
+</nav>
+
+<table class="list">
+    <caption>Authors</caption>
+    <thead>
+    <tr class="header">
+        <th width="10px">ID</th>
+        <th width="50%">First Name</th>
+        <th width="50%">Second name</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr
+            th:each="author, iStat : ${authors}"
+            th:class="${!iStat.odd}? 'even'"
+            class="odd"
+    >
+        <td th:text="${author.getId()}">1</td>
+        <td th:text="${author.getFirstName()}">author 1 fn</td>
+        <td th:text="${author.getSecondName()}">author 1 sn</td>
+    </tr>
+    <tr th:if="${false}" class="even">
+        <td>2</td>
+        <td >author 2 fn</td>
+        <td >author 2 sn</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

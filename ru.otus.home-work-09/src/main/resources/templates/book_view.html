@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>View book</title>
+    <link rel="stylesheet" href="../static/css/navigation.css" th:href="@{/css/navigation.css}" type="text/css">
+    <link rel="stylesheet" href="../static/css/table.css" th:href="@{/css/table.css}" type="text/css">
+    <link rel="shortcut icon" type="image/png" href="../static/book-icon.png" th:href="@{/book-icon.png}"/>
+</head>
+<body>
+
+<div th:object="${book}">
+
+    <nav>
+        <ul class="menu">
+            <li><img class="icon" src="../static/book-icon.png" th:src="@{/book-icon.png}"></li>
+            <li class="menu-text">Book viewer</li>
+            <li class="menu-control-buttons"><a href="books.html" th:href="@{/}"><button class="menu-control-cancel" type="button">Back</button></a></li>
+            <li class="menu-control-buttons"><a href="book_edit.html" th:href="@{/book/edit(id=${book.getId()})}"><button class="menu-control-save" type="button">Edit</button></a></li>
+        </ul>
+    </nav>
+
+    <div class="fields">
+        <table class="list">
+            <caption>Fields</caption>
+            <thead>
+            <tr>
+                <td>Field name</td>
+                <td>Field value</td>
+            </tr>
+            </thead>
+            <tbody>
+                <tr class="odd">
+                    <td>ID</td>
+                    <td th:text="*{id}">1</td>
+                </tr>
+                <tr class="even">
+                    <td>Name</td>
+                    <td th:text="*{name}">book 1</td>
+                </tr>
+                <tr class="odd">
+                    <td>Genre</td>
+                    <td th:text="${book.getGenre().getCode()}"/>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="authors" th:if="${book.getAuthors().size() > 0}">
+        <table class="list" id="authors_list">
+            <caption>Authors</caption>
+            <thead>
+            <tr>
+                <th width="10px">ID</th>
+                <th width="50%">First Name</th>
+                <th width="50%">Second name</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr
+                    th:each="author, iStat : ${book.getAuthors()}"
+                    th:class="${!iStat.odd}? 'even'"
+                    class="odd"
+            >
+                <td th:text="${author.getId()}">1</td>
+                <td th:text="${author.getFirstName()}">author 1 fn</td>
+                <td th:text="${author.getSecondName()}">author 1 sn</td>
+            </tr>
+            <tr th:if="${false}" class="even">
+                <td>2</td>
+                <td >author 2 fn</td>
+                <td >author 2 sn</td>
+            </tr>
+            <tr th:if="${false}" class="odd">
+                <td>3</td>
+                <td >author 3 fn</td>
+                <td >author 3 sn</td>
+            </tr>
+            <tr th:if="${false}" class="even">
+                <td>4</td>
+                <td >author 4 fn</td>
+                <td >author 4 sn</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="comments">
+        <table class="list">
+            <caption>Comments</caption>
+            <thead>
+            <tr>
+                <th width="10px">ID</th>
+                <th>Text</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tbody>
+            <tr
+                    th:each="comment, iStat : ${book.getBookComments()}"
+                    th:class="${!iStat.odd}? 'even'"
+                    class="odd"
+            >
+                <td th:text="${comment.getId()}">1</td>
+                <td th:text="${comment.getText()}">bla-bla-bla</td>
+            </tr>
+            </tbody>
+        </table>
+        <form id="comments-form" action="book_view.html" th:action="@{/book/add_comment}" th:method="post">
+            <input readonly name="book_id" th:value="${book.getId()}" hidden>
+            <textarea name="comment"></textarea>
+            <button type="submit">Add comment</button>
+        </form>
+    </div>
+
+
+</div>
+
+</body>
+</html>
